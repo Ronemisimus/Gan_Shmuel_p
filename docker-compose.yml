@@ -1,0 +1,34 @@
+version: "3.7"
+
+services:
+  app:
+    build: ./weight/
+    ports:
+      - "8080:5000"
+    volumes:
+      - data:/data
+    depends_on:
+      - db
+    expose:
+      - "5000"
+    environment:
+      - "FLASK_APP =app.py"
+  
+  db:
+    image: mysql:8.0
+    ports:
+      - "8081:3306"
+    volumes:
+      - data:/data
+    environment:
+      - "MYSQL_DATABASE=weightDB"
+      - "MYSQL_USER=user"
+      - "MYSQL_ROOT_PASSWORD=alpine"
+    expose:
+      - "3306"
+
+volumes:
+  data:
+    
+
+
