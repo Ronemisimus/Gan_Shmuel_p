@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Log in</title>
+    <head>
+    <body>
+        <form method = 'POST' action = '/weight'>
+            <p>
+                direction</br>
+                <input type="radio" name="direction" value="in" required> in<br>
+                <input type="radio" name="direction" value="out" required> out<br>
+                <input type="radio" name="direction" value="none" required> none<br>   
+            </p>
+            <p>
+                containers:
+                <input type = 'text' placeholder = 'containers' required name = 'containers'>
+            </p>
+            <p>
+                weight:
+                <input type = 'number' value = 'weight' required>
+                <input type="radio" name="unit" value="kg" required> kg
+                <input type="radio" name="unit" value="lbs" required> lbs
+            <p>
+            <p>
+                <input type="checkbox" name="force" >
+                force
+            </p>
+            <p> 
+                produce: 
+                <input type = 'text' placeholder = 'produce' required>
+
+
+            </p>
+            <input type = 'submit'>
+        </form>
+    </body>
+</html>
