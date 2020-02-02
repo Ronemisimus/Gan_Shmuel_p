@@ -1,8 +1,9 @@
-version: "3.7"
+version: "3.3"
 
 services:
   app:
     build: ./weight/
+    container_name: app
     ports:
       - "8080:5000"
     volumes:
@@ -16,10 +17,12 @@ services:
   
   db:
     image: mysql:8.0
+    container_name: DB
     ports:
       - "8081:3306"
     volumes:
       - data:/data
+      - ./db.sql:/docker-entrypoint-initdb.d/dump.sql
     environment:
       - "MYSQL_DATABASE=weightDB"
       - "MYSQL_USER=user"
