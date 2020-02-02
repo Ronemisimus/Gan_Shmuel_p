@@ -5,5 +5,5 @@ WORKDIR /app
 RUN pip3 install -r requirements.txt
 COPY . /app
 
-ENTRYPOINT sh entrypoint-FLASK.sh
+ENTRYPOINT flask run --host=0.0.0.0
 
