@@ -18,9 +18,9 @@ def check_db_status(host='db',database='weightDB',user='user',password='alpine')
 def health():
 
     if check_db_status():
-        return "Mysql connection"
+        return Response(status=200)
     else:
-        return "No Mysql connection"
+        return Response(status=500)
     
     # Todo:
     # select 1 from db 
