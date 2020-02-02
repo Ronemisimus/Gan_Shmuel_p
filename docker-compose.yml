@@ -5,7 +5,7 @@ services:
     build: ./weight/
     container_name: flask-server
     ports:
-      - "5000:5000"
+      - "8086:5000"
     volumes:
       - data:/data
     depends_on:
