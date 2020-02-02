@@ -1,0 +1,31 @@
+version: "3.7"
+services:
+  app:
+    build: ./app
+    environment:
+      - "PYTHONUNBUFFERED=0"
+      - "FLASK_ENV=development"
+      - "HOSTNAME=app"
+    expose: 
+      - "5000"
+    ports:
+      - "5000:5000"
+    links:
+      - db
+  db:
+    build: "./db"
+    ports:
+      - "5001:3306"
+    command: "--explicit_defaults_for_timestamp=1"
+    environment: 
+      - "MYSQL_DATABASE=billdb"
+      - "MYSQL_USER=user"
+      - "MYSQL_PASSWORD=1234"
+      - "MYSQL_ROOT_PASSWORD=root"
+      - "DATABASE_URL=/var/lib/mysql"
+    volumes:
+      - ./db/init/my.cnf:/etc/mysql/my.cnf
+      - ./db/init:/docker-entrypoint-initdb.d/:ro
+      - provider-db:/var/lib/mysql
+volumes:
+  provider-db:
