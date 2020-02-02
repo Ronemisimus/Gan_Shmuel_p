@@ -3,28 +3,28 @@ services:
   app:
     build: ./app
     environment:
-      - "PYTHONUNBUFFERED=0"
+      - "PYTHONUNBUFFERED=0" # To be removed on Prod
       - "FLASK_ENV=development"
-      - "HOSTNAME=app"
+      - "DB_HOST_NAME=db"
+      - "DB_DATABASE=billdb"
+      - "DB_USER=user"
+      - "DB_PASSWORD=1234"
     expose: 
       - "5000"
     ports:
-      - "5000:5000"
+      - "8087:5000"
     links:
       - db
   db:
     build: "./db"
-    ports:
-      - "5001:3306"
     command: "--explicit_defaults_for_timestamp=1"
     environment: 
       - "MYSQL_DATABASE=billdb"
       - "MYSQL_USER=user"
-      - "MYSQL_PASSWORD=1234"
+      - "MYSQL_PASSWORD=1234s"
       - "MYSQL_ROOT_PASSWORD=root"
       - "DATABASE_URL=/var/lib/mysql"
     volumes:
-      - ./db/init/my.cnf:/etc/mysql/my.cnf
       - ./db/init:/docker-entrypoint-initdb.d/:ro
       - provider-db:/var/lib/mysql
 volumes:

@@ -1,4 +1,6 @@
-from flask import render_template, request, jsonify, Response, json
+import requests
+import json
+from flask import render_template, request, jsonify, Response, json ,redirect ,Request
 from app import app
 from app import db
 from app.models import Truck, Provider, Rate
@@ -11,21 +13,35 @@ def format_providers(providers):
 
 def create_provider(provider_name):
   provider = Provider(name=provider_name)
-  db.session.add(provider)
-  db.session.commit()
-  return provider
+  check_provider=provider.query.filter_by(name=provider_name).first()
+  if check_provider is not None:
+    return None
+  else:
+    db.session.add(provider)
+    db.session.commit()
+    return provider
 
 @app.route('/health')
 def health():
   try:
-    db.execute('select 1')
+    db.session.execute('select 1')
+    return 'db is alive'
   except:
     return Response(status=500)
-  finally:
-    return 'db is alive'
 @app.route('/')
 def home():
     return 'Home page'
+
+@app.route('/provider',methods =['POST'])
+def provider():
+  provider_name=request.form['provider']
+  provider_res=create_provider(provider_name)
+  if provider_res is None:
+    return Response(json.dumps("Provider {} is already exists!".format(provider_name)),mimetype='application/json')
+  else:
+    res={'ID':provider_res.id}
+    return Response(json.dumps(res),mimetype='application/json')
+    
 
 # @app.route('/providers', methods=['GET', 'POST'])
 # def chat(provider=None):

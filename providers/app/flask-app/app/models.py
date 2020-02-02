@@ -10,8 +10,7 @@ class Provider(db.Model):
 
 class Rate(db.Model):
     __tablename__ = 'Rates'
-    product_id = db.Column(db.Integer, primary_key=True)
-    product_name = db.Column(db.String(50))
+    product_id = db.Column(db.String(50), primary_key=True)
     rate = db.Column(db.Integer)
     scope = db.Column(db.String(50))
     def __repr__(self):
