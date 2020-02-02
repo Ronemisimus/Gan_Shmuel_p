@@ -21,8 +21,8 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - data:/data
-      - ./db.sql:/docker-entrypoint-initdb.d/dump.sql
+      - data:/var/lib/mysql
+      - ./db.sql:/docker-entrypoint-initdb.d/db.sql
     environment:
       - "MYSQL_DATABASE=weightDB"
       - "MYSQL_USER=root"
