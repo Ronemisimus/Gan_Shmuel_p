@@ -16,11 +16,14 @@ def check_db_status(host='db',database='weightDB',user='user',password='alpine')
 @app.route("/")
 @app.route("/health")
 def health():
+
     if check_db_status():
         return "Mysql connection"
     else:
         return "No Mysql connection"
-
+    
+    # Todo:
+    # select 1 from db 
     '''
     print("enter to health\n")
     if (check_db_status()):
