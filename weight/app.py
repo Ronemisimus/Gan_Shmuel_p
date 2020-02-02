@@ -6,28 +6,24 @@ from mysql.connector import Error
 app = Flask(__name__)
 
 
-def check_db_status(host='db',database='weightDB',user='root',password='alpine'):
+def check_db_status(host='db',database='weightDB',user='user',password='alpine'):
     print("trying to connect...")
     #print("host:{}\n db:{}\n user:{}\n pass:{}".format(host,database,user,password))
     
-    try:
-        connection = mysql.connector.connect(host=host,
-                                         database=database, 
-                                         user=user,
-                                         password=password)
+    return mysql.connector.connect(password='alpine', user='root', host='db', port='3306', database='weightDB' ,  auth_plugin='mysql_native_password')
 
-        if connection.is_connected():
-            connection.close()
-            return True
-    except:
-        return False
-    
-    return True
 
 @app.route("/")
 @app.route("/health")
 def health():
 
+    if check_db_status():
+        return Response(status=200)
+    else:
+        return Response(status=500)
+    
+    # Todo:
+    # select 1 from db 
     '''
     print("enter to health\n")
     if (check_db_status()):
