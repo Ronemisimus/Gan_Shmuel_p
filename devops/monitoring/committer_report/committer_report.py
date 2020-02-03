@@ -21,9 +21,21 @@ def heath_test():
 def log():
    data = request.get_json()
 
-   msg = Message("New Commit By: {}".format(data['committer', 'name']), sender="gan.shmuel.ashdod@gmail.com",  recipients=["eigorek@gmail.com"])
-   msg.body("Commit Message: {}".format(data['head_commit', 'message']))
-   mail.send(msg)
+   commits = data['commits']
+
+   messages = []
+
+	for commit in commits:
+      messages.append("Commit Message: {}<br>".format(commit))
+
+   email_subject = "New Push By: {}".format(data['pusher']['name'])
+
+   email = Message(email_subject, sender="gan.shmuel.ashdod@gmail.com", recipients=["eigorek@gmail.com"])
+
+   email.body(messages)
+
+   mail.send(email)
+   
    return Response("200")
 
 if __name__ == '__main__':
