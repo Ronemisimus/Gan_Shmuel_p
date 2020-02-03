@@ -23,6 +23,8 @@ def dbQuery(sql, isInsert=None):
     else:
     	return mycursor.fetchall()
 
+
+
 # Todo: See how we can instantiate the DB only once , and pass it to app.py
 def check_db_status(host='db',database='weightDB',user='user',password='alpine'):
     return mysql.connector.connect(password='alpine', user='root', host='db', port='3306', database='weightDB' ,  auth_plugin='mysql_native_password')
@@ -54,30 +56,60 @@ def session(id):
     # Read the instructions
     return "OK"
 
+
+#Convert yyyymmsddhhmmss to datetime object
+def parse_time(t):
+    # override t1 if argument was not supplided and equal None
+    if not t:
+        # Default t1 time is 1st of month at 000000
+        year_format = datetime.date.today().replace(day=1)
+        zero = datetime.time(0,00)
+        t = datetime.datetime.combine(year_format ,zero)
+    else:
+        t = datetime.datetime.strptime(t , '%Y%m%d%H%M%S')
+    
+    return t
+
+
+
 @app.route('/item/<id>' , methods=["GET"])
 def get_item(id):
 
     # Get the id for an item(truck or container)   
-    transactionId = dbQuery('select * from TruckContainers where id={}'.format(id))
-    trackId = dbQuery('select * from Transactions where TruckID={}'.format(id))
+    trackId = dbQuery('select * from Transactions where TruckID="{}"'.format(id))
 
     # if truck or container does not exists
-    if not (transactionId or trackId):
+    if not (trackId):
         return Response(status="404")
-    
-    # from time
-    t1 = request.args.get('from') if request.args.get('from') else  datetime.date.today().replace(day=1)
-    zero = datetime.time(0,00)
-    t1 = datetime.datetime.combine(t1 ,zero)
-
-    # to time
-    t2 = request.args.get('to') if request.args.get('to') else strftime("%Y-%m-%d %H:%M:%S", gmtime()) 
 
 
-    return "from - {} to - {} ".format(t1 , t2)
+    t1 = request.args.get('from')
+    t1 = parse_time(t1)
+
+    # Default t2 time- now
+    t2 = request.args.get('to')
     
+    # override the t2 time
+    if not t2:
+        t2 = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+    else:
+        t2 = datetime.datetime.strptime(t2 , '%Y%m%d%H%M%S')
+
     
-    #return "OK"
+    sessions_result_list = dbQuery('''SELECT t.TruckID, SUM(t2.WeightProduce), t.ID
+    FROM
+        weightDB.Transactions t
+    INNER JOIN weightDB.TruckContainers t2 ON
+        t2.TransactionID = t.ID
+    WHERE
+        t.TruckID = "{}"
+        AND t.TimeIn >= STR_TO_DATE('{}','%Y-%m-%d %T')
+        AND t.TimeOut <= STR_TO_DATE('{}','%Y-%m-%d %T')
+    GROUP BY
+        t.ID'''.format(trackId,str(t1),str(t2)),False)
+    
+    return str(len(sessions_result_list))
+    
 
 
 app.route("/weight", methods=['GET', 'POST'])
