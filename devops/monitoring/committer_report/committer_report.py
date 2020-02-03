@@ -24,7 +24,7 @@ def log():
    commits = data['commits']
 
    messages = []
-   #
+   
 	for commit in commits:
       messages.append("Commit Message: {}<br>".format(commit["message"]))
 
