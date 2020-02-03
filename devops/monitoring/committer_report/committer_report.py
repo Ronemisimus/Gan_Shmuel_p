@@ -1,6 +1,5 @@
 from flask import Flask, request, Response
 import json
-import os
 from flask_mail import Mail, Message
 
 app = Flask(__name__)
