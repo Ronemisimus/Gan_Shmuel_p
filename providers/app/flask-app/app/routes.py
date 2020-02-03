@@ -63,7 +63,7 @@ def truck():
     if res_provider is None:
       return Response(json.dumps('Provider ({}) Not Found'.format(provider_id)),mimetype='application/json')
     try:
-      new_truck = Truck(id=truck_id, provider_id=provider_id)
+      new_truck = Truck(id=truck_id, truck_provider=res_provider)
     except:
       return Response(status=500)
     db.session.add(new_truck)
