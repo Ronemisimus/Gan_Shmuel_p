@@ -5,7 +5,7 @@ from mysql.connector import Error
 from insertions import read_json_file , read_csv_file
 app = Flask(__name__)
 
-def dbQuery(sql):
+def dbQuery(sql, isInsert):
     mydb = mysql.connector.connect(
     host='db',
     database='weightDB',
@@ -15,20 +15,12 @@ def dbQuery(sql):
     )
     mycursor = mydb.cursor()
     mycursor.execute(sql)
-    return mycursor.fetchall()
 
-def dbInsert(sql):
-    mydb = mysql.connector.connect(
-    host='db',
-    database='weightDB',
-    user='root',
-    password='alpine',
-    port='3306'
-    )
-    mycursor = mydb.cursor()
-    mycursor.execute(sql)
-    mydb.commit()
-    return str(mycursor.lastrowid)
+    if isInsert:
+    	mydb.commit()
+    	return str(mycursor.lastrowid)
+    else:
+    	return mycursor.fetchall()
 
 # Todo: See how we can instantiate the DB only once , and pass it to app.py
 def check_db_status(host='db',database='weightDB',user='user',password='alpine'):
@@ -77,16 +69,16 @@ def get_item(id):
 #         force = Request.values.get('username') or false
 #         produce = Request.values.get('produce')
 
-#     currtime = "1998-03-03 12:43:23"
-#     direction = "in"
-#     truckID = "T1ABD"
-#     containerIDs = "C1,C2"
-#     force = "false"
-#     produce = "Oranges,Potatoes"
-#     TransactionID = dbInsert("INSERT INTO Transactions (Status, TruckID, TimeIn) VALUES ('%s', '%s', '%s')"%(direction,truckID,currtime))
-#     test2= dbQuery("SELECT * FROM Transactions")
+    # currtime = "1998-03-03 12:43:23"
+    # direction = "in"
+    # truckID = "T1ABD"
+    # containerIDs = "C1,C2"
+    # force = "false"
+    # produce = "Oranges,Potatoes"
+    # TransactionID = dbQuery("INSERT INTO Transactions (Status, TruckID, TimeIn) VALUES ('%s', '%s', '%s')"%(direction,truckID,currtime), True)
+    # test2= dbQuery("SELECT * FROM Transactions", False)
 
-#     return test
+    # return str(test2[0][2])
 
 if __name__ == '__main__':
     app.run(debug = True, host="0.0.0.0")
