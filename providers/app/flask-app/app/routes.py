@@ -50,7 +50,7 @@ def truck():
     if res_provider is None:
       return 'Provider ({}) Not Found'.format(provider_id)
     try:
-      new_truck = Truck(id=truck_id, provider_id=provider_id)
+      new_truck = Truck(id=truck_id, truck_provider=res_provider)
     except:
       return Response(status=500)
     db.session.add(new_truck)
