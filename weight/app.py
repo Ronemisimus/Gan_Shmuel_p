@@ -1,5 +1,5 @@
 from flask import Flask, request, Response
-from datetime import datetime
+from datetime import datetime , time 
 from time import gmtime, strftime
 import mysql.connector
 from mysql.connector import Error
@@ -33,7 +33,7 @@ def check_db_status(host='db',database='weightDB',user='user',password='alpine')
 @app.route("/health")
 def health():
     if check_db_status():
-        return Response(status=200)
+        return "OK"
     else:
         return Response(status=500)
 
@@ -72,8 +72,8 @@ def parse_time(t):
     # override t1 if argument was not supplided and equal None
     if not t:
         # Default t1 time is 1st of month at 000000
-        year_format = datetime.date.today().replace(day=1)
-        zero = datetime.time(0,00)
+        year_format = datetime.today().replace(day=1)
+        zero = time(00,00,00)
         t = datetime.combine(year_format ,zero)
     else:
         t = datetime.strptime(t , '%Y%m%d%H%M%S')
@@ -81,18 +81,18 @@ def parse_time(t):
     return t
 
 
+
+
 @app.route('/item/<id>' , methods=["GET"])
 def get_item(id):
 
-    # if truck or container does not exists
+    # if id was not provided
     if not id:
-        return Response(status="404")
-
+        return Response(status=404) 
 
     t1 = request.args.get('from')
     t1 = parse_time(t1)
 
-    # Default t2 time- now
     t2 = request.args.get('to')
     
     # override the t2 time
