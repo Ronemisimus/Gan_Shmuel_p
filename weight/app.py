@@ -1,5 +1,5 @@
 from flask import Flask, request, Response
-import datetime
+from datetime import datetime
 from time import gmtime, strftime
 import mysql.connector
 from mysql.connector import Error
@@ -23,8 +23,6 @@ def dbQuery(sql, isInsert=None):
     	return str(mycursor.lastrowid)
     else:
     	return mycursor.fetchall()
-
-
 
 # Todo: See how we can instantiate the DB only once , and pass it to app.py
 def check_db_status(host='db',database='weightDB',user='user',password='alpine'):
@@ -71,9 +69,9 @@ def parse_time(t):
         # Default t1 time is 1st of month at 000000
         year_format = datetime.date.today().replace(day=1)
         zero = datetime.time(0,00)
-        t = datetime.datetime.combine(year_format ,zero)
+        t = datetime.combine(year_format ,zero)
     else:
-        t = datetime.datetime.strptime(t , '%Y%m%d%H%M%S')
+        t = datetime.strptime(t , '%Y%m%d%H%M%S')
     
     return t
 
@@ -100,7 +98,7 @@ def get_item(id):
     if not t2:
         t2 = strftime("%Y-%m-%d %H:%M:%S", gmtime())
     else:
-        t2 = datetime.datetime.strptime(t2 , '%Y%m%d%H%M%S')
+        t2 = datetime.strptime(t2 , '%Y%m%d%H%M%S')
 
     
     sessions_result_list = dbQuery('''SELECT t.TruckID, SUM(t2.WeightProduce), t.ID
@@ -119,7 +117,7 @@ def get_item(id):
     
 
 
-app.route("/weight", methods=['GET', 'POST'])
+@app.route("/weight", methods=['GET', 'POST'])
 def weight():
 	if request.method == 'POST':
 		return "post"
@@ -134,26 +132,42 @@ def weight():
     #     else:
     #     	dbQuery("UPDATE Transactions SET TimeOut = %s WHERE TruckID = %s AND Status = 'in'"%(currtime,truckID),True)
 
-    
+	else:
+		if request.args.get("from"):
+			start = parse_time(request.args.get('from'))
+		else:
+			start = datetime.now().strftime("%Y-%m-%d 00:00:00")
+		if request.args.get("to"):
+			end = parse_time(request.args.get('to'))
+		else:
+			end = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		# filt = request.args.get('filter').split(",") or "('in','out','none')"
+		if request.args.get("f"):
+			filt=("("+request.args.get("f")+")").replace("(","('").replace(",","','").replace(")","')")
+		else:
+			filt = "('in','out','none')"
 
-	# transactionID="35"
-	# ContainersList=dbQuery('''SELECT t.id,t2.TruckID,t.Produce,(SUM(t.WeightProduce)+SUM(c.Weight)) AS Bruto,t.WeightProduce AS Neto
-	# FROM
-	# 	weightDB.TruckContainers t
-	# INNER JOIN weightDB.Transactions t2 ON
-	# 	t.TransactionID = t2.ID
-	# INNER JOIN weightDB.Containers c ON
-	# 	c.ID = t.ContainerID
-	# WHERE
-	# 	t.TransactionID = %s
-	# GROUP BY t.id'''%transactionID,False)
-	# # ContainersList=dbQuery("SELECT * FROM TruckContainers WHERE (TransactionID=%s)"%transactionID,False)
+		sql='''SELECT t2.TransactionID, t.Status, (SUM(t2.WeightProduce) + SUM(c.Weight)) AS bruto, SUM(t2.WeightProduce) AS neto, GROUP_CONCAT(DISTINCT t2.Produce) AS products, GROUP_CONCAT(DISTINCT t2.ContainerID) AS Containers
+		FROM
+			weightDB.Transactions t
+		INNER JOIN weightDB.TruckContainers t2 ON
+			t.ID = t2.TransactionID
+		INNER JOIN weightDB.Containers c ON
+			t2.ContainerID = c.ID
+		WHERE
+			t.TimeIn >= STR_TO_DATE('{}',
+			'%Y-%m-%d %T')
+			AND t.TimeOut <= STR_TO_DATE('{}',
+			'%Y-%m-%d %T')
+			AND t.Status IN {}
+		GROUP BY
+			t2.TransactionID'''.format(start, end, filt)
+		TransactionsList = dbQuery(sql)
+		rtn={}
+		for tran in TransactionsList:
+			rtn[str(tran[0])] = {'direction':str(tran[1]),'bruto':str(tran[2]),'neto': str(tran[3]),'produces':str(tran[4]),'containers':str(tran[5])}
 
-	# rtn={}
-	# for con in ContainersList:
-	# 	rtn[str(con[0])] = {'truck':str(con[1]),'produce':str(con[2]),'bruto': str(con[3]),'neto':str(con[4])}
-
-	# return rtn
+		return rtn
 
 if __name__ == '__main__':
     app.run(debug = True, host="0.0.0.0")
