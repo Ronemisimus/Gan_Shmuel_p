@@ -42,30 +42,41 @@ def provider():
     res={'ID':provider_res.id}
     return Response(json.dumps(res),mimetype='application/json')
     
+@app.route('/truck', methods=['POST'])
+def truck():
+    provider_id = request.args.get('provider_id')
+    truck_id = request.args.get('truck')
+    res_provider = Provider.query.filter_by(id=provider_id).first()
+    if res_provider is None:
+      return 'Provider ({}) Not Found'.format(provider_id)
+    try:
+      new_truck = Truck(id=truck_id, provider_id=provider_id)
+    except:
+      return Response(status=500)
+    db.session.add(new_truck)
+    db.session.commit()
+    res_truck = {
+      'id': new_truck.id,
+      'provider_id': new_truck.provider_id
+    }
+    return Response(json.dumps(res_truck), mimetype="application/json")
 
-# @app.route('/providers', methods=['GET', 'POST'])
-# def chat(provider=None):
-#   return render_template("index.html", provider=provider)
-
-# @app.route('/api/<provider>', methods=['GET', 'POST'])
-# def get_providers(provider=None):
-#   res_provider = Provider.query.filter_by(name=provider).first()
-#   if res_provider is None:
-#     new_provider = create_provider(provider)
-#     res_provider = Provider.query.filter_by(name=provider).first()
-
-#   # if request.method == 'POST':
-#   #   username = request.form.get('username')
-#   #   msg = request.form.get('msg')
-#   #   new_post = Post(msg=msg, room_id=res_room.room_id, username=username)
-#   #   db.session.add(new_post)
-#   #   db.session.commit()
-
-#   # posts = Post.query.filter_by(room_id=res_room.room_id).all()
-#   providers = Provider.query.all()
-#   res_prov = format_providers(providers);
-  
-#   try:
-#     return res_prov
-#   except:
-#     return Response(status=500)
+@app.route('/truck/<truck_id>', methods=['PUT'])
+def update_truck(truck_id):
+    print(truck_id)
+    provider_id = request.args.get('provider_id')
+    res_provider = Provider.query.filter_by(id=provider_id).first()
+    if res_provider is None:
+      return 'Provider ({}) Not Found'.format(provider_id)
+    
+    truck = Truck.query.filter_by(id=truck_id).first()
+    if truck is None:
+      return 'Truck ({}) Not Found'.format(truck_id)
+      
+    truck.provider_id = provider_id
+    db.session.commit()
+    res_truck = {
+      'id': truck.id,
+      'provider_id': truck.provider_id
+    }
+    return Response(json.dumps(res_truck), mimetype="application/json")

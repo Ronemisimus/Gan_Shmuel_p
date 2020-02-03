@@ -21,7 +21,7 @@ services:
     environment: 
       - "MYSQL_DATABASE=billdb"
       - "MYSQL_USER=user"
-      - "MYSQL_PASSWORD=1234s"
+      - "MYSQL_PASSWORD=1234"
       - "MYSQL_ROOT_PASSWORD=root"
       - "DATABASE_URL=/var/lib/mysql"
     volumes:
