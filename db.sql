@@ -25,7 +25,6 @@ DROP TABLE IF EXISTS `Containers`;
 CREATE TABLE `Containers` (
   `ID` varchar(10) NOT NULL,
   `Weight` int DEFAULT NULL,
-  `Unit` varchar(3) DEFAULT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `id_UNIQUE` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -37,7 +36,7 @@ CREATE TABLE `Containers` (
 
 LOCK TABLES `Containers` WRITE;
 /*!40000 ALTER TABLE `Containers` DISABLE KEYS */;
-INSERT INTO `Containers` VALUES ('C1',12,'KG'),('C2',6,'KG');
+INSERT INTO `Containers` VALUES ('C1',12),('C2',6);
 /*!40000 ALTER TABLE `Containers` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -56,7 +55,7 @@ CREATE TABLE `Transactions` (
   `TimeOut` datetime DEFAULT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `id_UNIQUE` (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -65,7 +64,7 @@ CREATE TABLE `Transactions` (
 
 LOCK TABLES `Transactions` WRITE;
 /*!40000 ALTER TABLE `Transactions` DISABLE KEYS */;
-INSERT INTO `Transactions` VALUES (35,'in','Truck1','2020-02-03 11:27:32',NULL);
+INSERT INTO `Transactions` VALUES (35,'in','Truck1','2020-02-03 11:27:32','2020-02-04 11:27:32'),(36,'In','Truck1','1998-07-09 12:34:23','1999-02-04 11:27:32');
 /*!40000 ALTER TABLE `Transactions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -84,7 +83,7 @@ CREATE TABLE `TruckContainers` (
   `WeightProduce` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -93,7 +92,7 @@ CREATE TABLE `TruckContainers` (
 
 LOCK TABLES `TruckContainers` WRITE;
 /*!40000 ALTER TABLE `TruckContainers` DISABLE KEYS */;
-INSERT INTO `TruckContainers` VALUES (3,35,'C1','Oranges',34),(4,35,'C2','Apples',23);
+INSERT INTO `TruckContainers` VALUES (3,35,'C1','Oranges',34),(4,35,'C2','Apples',23),(5,36,'C1','Tomato',12),(6,35,'C1','Apples',35);
 /*!40000 ALTER TABLE `TruckContainers` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -106,4 +105,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-02-03  9:58:45
+-- Dump completed on 2020-02-03 14:54:30
