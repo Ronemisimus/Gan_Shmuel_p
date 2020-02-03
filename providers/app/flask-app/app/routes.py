@@ -3,6 +3,7 @@ from flask import request, jsonify, Response, json
 from app import app, db
 from app.models import Truck, Provider, Rate
 from datetime import datetime, timezone
+import xlrd, os
 
 # comment init
 def format_providers(providers):
@@ -123,3 +124,40 @@ def update_truck(truck_id):
       res = requests.post(item_url, data={'form': from_date, 'to': to_date})
 
       return Response(res)
+
+@app.route('/rates', methods=['GET' , 'POST'])
+def rates():
+    if request.method=='GET':
+      return "Boo!!! O_O"      
+
+    elif request.method=='POST':
+      filename=request.form['file']
+      try:
+        book = xlrd.open_workbook(os.getcwd()+'/in/'+filename+'.xlsx', on_demand=True)
+      except:
+          print ("File doesn't exists in '/in' folder.")
+          return Response(status=500)
+      else:
+        data = []
+        sheet = book.sheet_by_index(0)
+        for i in range(1,sheet.nrows):
+          for j in range(sheet.ncols):
+            if j==0:
+              product=str(sheet.cell(i,j).value )
+            elif j==1:
+              rate = int(sheet.cell(i,j).value )
+            elif j==2:
+              scope = str(sheet.cell(i,j).value )
+          new_rate = Rate(product_id=product,rate=rate,scope=scope)
+          data.append(new_rate)
+        book.release_resources()
+      try:
+        currContent=Rate.query.filter_by(True)
+        db.session.delete(currContent)
+        db.session.commit()
+        db.session.add_all(data)
+        db.session.commit()
+      except:
+          print ("Coldn't insert to DB")
+          return Response(status=500)
+      return 'Done'
