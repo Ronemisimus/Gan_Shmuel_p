@@ -23,16 +23,16 @@ def log():
 
    commits = data['commits']
 
-   messages = []
+   messages = ""
    
 	for commit in commits:
-      messages.append("Commit Message: {}<br>".format(commit["message"]))
+      messages.append("Commit Message: {}\n".format(commit["message"]))
 
    email_subject = "New Push By: {}".format(data['pusher']['name'])
 
    email = Message(email_subject, sender="gan.shmuel.ashdod@gmail.com", recipients=["eigorek@gmail.com"])
 
-   email.body(messages)
+   email.body = message)
 
    mail.send(email)
    
