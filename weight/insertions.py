@@ -1,22 +1,24 @@
 import csv
-import sys
 import json
 
 # Read file in json format
+#return list of tuples(id, weight, unit)
 def read_json_file(filename):
-    return True
+    data = []
     with open(filename, 'r') as json_file:
-        data = json.load(json_file)
-        for line in data:
-            # print (line.get("id") + " weight " + str(line.get("weight")) + " units " + line.get("unit"))
-            insertVariblesIntoTable(line.get("id"), line.get("weight"), line.get("unit"))
+        lines = json.load(json_file)
+        for line in lines:
+            data.append((line.get("id"), str(line.get("weight")), line.get("unit")))
+    return data
 
 # Read file in csv format
+#return list of tuples(id, weight, unit)
 def read_csv_file(filename):
-    with open(filepath, 'r') as csv_file:
+    data = []
+    with open(filename, 'r') as csv_file:
         csv_reader = csv.reader(csv_file)
         title_line = next(csv_reader)
         unit = title_line[1]
         for line in csv_reader:
-            insertVariblesIntoTable(line[0], int(line[1]), unit)
-
+            data.append((line[0], line[1], unit))
+    return data
