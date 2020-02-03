@@ -24,12 +24,9 @@ def dbQuery(sql, isInsert=None):
     else:
     	return mycursor.fetchall()
 
-
-
 # Todo: See how we can instantiate the DB only once , and pass it to app.py
 def check_db_status(host='db',database='weightDB',user='user',password='alpine'):
     return mysql.connector.connect(password='alpine', user='root', host='db', port='3306', database='weightDB' ,  auth_plugin='mysql_native_password')
-
 
 # Entery points
 @app.route("/")
@@ -78,15 +75,11 @@ def parse_time(t):
     return t
 
 
-
 @app.route('/item/<id>' , methods=["GET"])
 def get_item(id):
 
-    # Get the id for an item(truck or container)   
-    trackId = dbQuery('select * from Transactions where TruckID="{}"'.format(id))
-
     # if truck or container does not exists
-    if not (trackId):
+    if not id:
         return Response(status="404")
 
 
@@ -102,7 +95,6 @@ def get_item(id):
     else:
         t2 = datetime.datetime.strptime(t2 , '%Y%m%d%H%M%S')
 
-    
     sessions_result_list = dbQuery('''SELECT t.TruckID, SUM(t2.WeightProduce), t.ID
     FROM
         weightDB.Transactions t
@@ -113,11 +105,19 @@ def get_item(id):
         AND t.TimeIn >= STR_TO_DATE('{}','%Y-%m-%d %T')
         AND t.TimeOut <= STR_TO_DATE('{}','%Y-%m-%d %T')
     GROUP BY
-        t.ID'''.format(trackId,str(t1),str(t2)),False)
-    
-    return str(len(sessions_result_list))
-    
+        t.ID'''.format(str(id),str(t1),str(t2)))
 
+    if not len(sessions_result_list):
+        return {}
+
+    sesseions_array = []
+    tara = int(sessions_result_list[0][1])
+
+    for result in sessions_result_list:
+        sesseions_array.append(result[2])
+    
+    return {"id":str(id) , "tara":tara , "sessions":sesseions_array}
+        
 
 app.route("/weight", methods=['GET', 'POST'])
 def weight():
