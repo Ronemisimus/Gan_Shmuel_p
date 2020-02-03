@@ -24,6 +24,7 @@ def log():
    msg = Message("New Commit By: {}".format(data['committer', 'name']), sender="gan.shmuel.ashdod@gmail.com",  recipients=["eigorek@gmail.com"])
    msg.body("Commit Message: {}".format(data['head_commit', 'message']))
    mail.send(msg)
+   #test
    return Response("200")
 
 if __name__ == '__main__':
