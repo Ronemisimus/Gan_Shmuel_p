@@ -10,8 +10,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   committer-report:
-    build: ./monitoring/committer-report
-    image: monitoring/committer-report
+    build: ./monitoring/committer_report
+    image: monitoring/committer_report
     ports:
       - "8084:8084"
 
