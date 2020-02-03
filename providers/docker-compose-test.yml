@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   app:
-    image: ${IMAGE_NAME}:latest
+    build: ./app
     environment:
       - "PYTHONUNBUFFERED=0" # To be removed on Prod
       - "FLASK_ENV=development"
