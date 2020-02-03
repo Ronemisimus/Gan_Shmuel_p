@@ -4,6 +4,7 @@ from time import gmtime, strftime
 import mysql.connector
 from mysql.connector import Error
 from insertions import read_json_file , read_csv_file
+import json
 app = Flask(__name__)
 
 def dbQuery(sql, isInsert=None):
@@ -43,6 +44,12 @@ def health():
 def batch_weight(filename):
     # Will upload list of tara weights from a file in "/in" folder. Usually used to accept a batch of new containers. 
     # File formats accepted: csv (id,kg), csv (id,lbs), json ([{"id":..,"weight":..,"unit":..},...])
+    if ".csv" in filename:
+        data = read_csv_file("in/" + filename)
+    if ".json" in filename:
+        data = read_json_file("in/" + filename)
+    for tuple in data:
+        dbQuery("INSERT INTO Containers (ID, Weight, Unit) VALUES ('"+ tuple[0] + "','" +  tuple[1] + "','" + tuple[2]+ "')", True)
     return "OK"
 
 @app.route('/unknown' , methods=["GET"])
@@ -127,9 +134,24 @@ def weight():
     #     else:
     #     	dbQuery("UPDATE Transactions SET TimeOut = %s WHERE TruckID = %s AND Status = 'in'"%(currtime,truckID),True)
 
-	test2= dbQuery("SELECT * FROM Transactions", False)
+	transactionID="35"
+	ContainersList=dbQuery('''SELECT t.id,t2.TruckID,t.Produce,(SUM(t.WeightProduce)+SUM(c.Weight)) AS Bruto,t.WeightProduce AS Neto
+	FROM
+		weightDB.TruckContainers t
+	INNER JOIN weightDB.Transactions t2 ON
+		t.TransactionID = t2.ID
+	INNER JOIN weightDB.Containers c ON
+		c.ID = t.ContainerID
+	WHERE
+		t.TransactionID = %s
+	GROUP BY t.id'''%transactionID,False)
+	# ContainersList=dbQuery("SELECT * FROM TruckContainers WHERE (TransactionID=%s)"%transactionID,False)
 
-	return str(test2[0][2])
+	rtn={}
+	for con in ContainersList:
+		rtn[str(con[0])] = {'truck':str(con[1]),'produce':str(con[2]),'bruto': str(con[3]),'neto':str(con[4])}
+
+	return rtn
 
 if __name__ == '__main__':
     app.run(debug = True, host="0.0.0.0")
