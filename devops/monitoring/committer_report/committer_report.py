@@ -26,7 +26,7 @@ def log():
    messages = []
 
 	for commit in commits:
-   messages.append("Commit Message: {}<br>".format(commit[message]))
+      messages.append("Commit Message: {}<br>".format(commit))
 
    email_subject = "New Push By: {}".format(data['pusher', 'name'])
 
@@ -35,7 +35,7 @@ def log():
    msg.body(messages)
 
    mail.send(msg)
-   #
+   
    return Response("200")
 
 if __name__ == '__main__':
