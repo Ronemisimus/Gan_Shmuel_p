@@ -1,5 +1,4 @@
 from flask import Flask, Response, request
-import requests
 import os
 import sys
 
