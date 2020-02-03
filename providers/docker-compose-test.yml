@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   app:
-    image: ${IMAGE_NAME}:latest
+    build: ./app
     environment:
       - "PYTHONUNBUFFERED=0" # To be removed on Prod
       - "FLASK_ENV=development"
@@ -15,8 +15,6 @@ services:
       - ${PORT}:5000
     links:
       - db
-    volumes: 
-      - ./app/flask-app/in:/flask-app/in
   db:
     build: "./db"
     command: "--explicit_defaults_for_timestamp=1"
