@@ -55,8 +55,12 @@ def batch_weight(filename):
 @app.route('/unknown' , methods=["GET"])
 def unknown():
     # Returns a list of all recorded containers that have unknown weight:
-    # ["id1","id2",...]
-    return "OK"
+    # "id1" "id2"
+    unknown_containers = ""
+    data = dbQuery("SELECT * FROM Containers WHERE Weight is NULL", isInsert=False)
+    for tuple in data:
+        unknown_containers = unknown_containers + tuple[0] + '  '
+    return unknown_containers
 
 @app.route('/session/<id>' , methods=["GET"])
 def session(id):
