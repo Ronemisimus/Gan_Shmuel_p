@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  ci-server:
+    build: ./ci-server
+    image: ci-server
+    ports:
+      - "8085:8085"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  committer-report:
+    build: ./monitoring/committer-report
+    image: monitoring/committer-report
+    ports:
+      - "8084:8084"
+
