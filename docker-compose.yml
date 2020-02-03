@@ -1,11 +1,10 @@
 version: "3.3"
 
 services:
-  flask-server:
+  app:
     build: ./weight/
-    container_name: flask-server
     ports:
-      - "8086:5000"
+      - "8089:5000"
     volumes:
       - data:/data
     depends_on:
@@ -17,7 +16,6 @@ services:
   
   db:
     image: mysql:8.0
-    container_name: DB
     ports:
       - "3306:3306"
     volumes:

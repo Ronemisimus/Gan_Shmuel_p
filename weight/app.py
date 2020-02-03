@@ -1,11 +1,13 @@
 from flask import Flask, request, Response
+import datetime
+from time import gmtime, strftime
 import mysql.connector
 from mysql.connector import Error
 from insertions import read_json_file , read_csv_file
 import json
 app = Flask(__name__)
 
-def dbQuery(sql, isInsert):
+def dbQuery(sql, isInsert=None):
     mydb = mysql.connector.connect(
     host='db',
     database='weightDB',
@@ -21,6 +23,8 @@ def dbQuery(sql, isInsert):
     	return str(mycursor.lastrowid)
     else:
     	return mycursor.fetchall()
+
+
 
 # Todo: See how we can instantiate the DB only once , and pass it to app.py
 def check_db_status(host='db',database='weightDB',user='user',password='alpine'):
@@ -59,13 +63,63 @@ def session(id):
     # Read the instructions
     return "OK"
 
+
+#Convert yyyymmsddhhmmss to datetime object
+def parse_time(t):
+    # override t1 if argument was not supplided and equal None
+    if not t:
+        # Default t1 time is 1st of month at 000000
+        year_format = datetime.date.today().replace(day=1)
+        zero = datetime.time(0,00)
+        t = datetime.datetime.combine(year_format ,zero)
+    else:
+        t = datetime.datetime.strptime(t , '%Y%m%d%H%M%S')
+    
+    return t
+
+
+
 @app.route('/item/<id>' , methods=["GET"])
 def get_item(id):
-    # Read the instructions
-    return "OK"
+
+    # Get the id for an item(truck or container)   
+    trackId = dbQuery('select * from Transactions where TruckID="{}"'.format(id))
+
+    # if truck or container does not exists
+    if not (trackId):
+        return Response(status="404")
 
 
-@app.route("/weight", methods=['GET', 'POST'])
+    t1 = request.args.get('from')
+    t1 = parse_time(t1)
+
+    # Default t2 time- now
+    t2 = request.args.get('to')
+    
+    # override the t2 time
+    if not t2:
+        t2 = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+    else:
+        t2 = datetime.datetime.strptime(t2 , '%Y%m%d%H%M%S')
+
+    
+    sessions_result_list = dbQuery('''SELECT t.TruckID, SUM(t2.WeightProduce), t.ID
+    FROM
+        weightDB.Transactions t
+    INNER JOIN weightDB.TruckContainers t2 ON
+        t2.TransactionID = t.ID
+    WHERE
+        t.TruckID = "{}"
+        AND t.TimeIn >= STR_TO_DATE('{}','%Y-%m-%d %T')
+        AND t.TimeOut <= STR_TO_DATE('{}','%Y-%m-%d %T')
+    GROUP BY
+        t.ID'''.format(trackId,str(t1),str(t2)),False)
+    
+    return str(len(sessions_result_list))
+    
+
+
+app.route("/weight", methods=['GET', 'POST'])
 def weight():
 	if request.method == 'POST':
 		return "post"
