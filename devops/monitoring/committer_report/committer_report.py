@@ -22,7 +22,7 @@ mail = Mail(app)
 #    # mail.send(msg)
     
 
-@app.route('health', methods=['GET'])
+@app.route('/health', methods=['GET'])
 def heath_test():
    return "committer report test"    
 
