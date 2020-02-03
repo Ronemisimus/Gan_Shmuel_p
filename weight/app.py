@@ -46,7 +46,7 @@ def batch_weight(filename):
     if ".json" in filename:
         data = read_json_file("in/" + filename)
     for tuple in data:
-        dbQuery("INSERT INTO Containers (ID, Weight, Unit) VALUES ('"+ tuple[0] + "','" +  tuple[1] + "','" + tuple[2]+ "')", True)
+        dbQuery("INSERT INTO Containers (ID, Weight) VALUES ('"+ tuple[0] + "','" +  str(tuple[1]) +"')", True)
     return "OK"
 
 @app.route('/unknown' , methods=["GET"])
@@ -58,6 +58,8 @@ def unknown():
 @app.route('/session/<id>' , methods=["GET"])
 def session(id):
     # Read the instructions
+    # get table [  ]
+
     return "OK"
 
 
