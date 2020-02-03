@@ -25,10 +25,10 @@ mail = Mail(app)
 @app.route('/committer_report', methods=['POST'])
 def log():
    data = request.get_json()
-   user_name =  data['repository']['name']
+   comment = data['comment']
 
    # data = json.loads(request.data)
-   msg_to_send = "New commit by: {}".format(user_name)
+   msg_to_send = "New commit by: {}".format(comment)
    msg = Message(msg_to_send, sender="gan.shmuel.ashdod@gmail.com",  recipients=["eigorek@gmail.com"])
    mail.send(msg)
    return "ok"
