@@ -1,5 +1,6 @@
 from flask import Flask, Response, request
 import os
+import sys
 
 app = Flask(__name__)
 
@@ -13,7 +14,7 @@ BRANCHES = {
 
 @app.route('/payload', methods=['POST'])
 def gitWebHook():
-	print(request.get_json())
+	print(request.get_json(), file=sys.stderr)
 	for branch in BRANCHES:
 		os.system('rm -rf ../{}'.format(branch))
 		os.system('git clone {} --single-branch -b {} ../{}'.format(REPOSITORY_URL, branch, branch))
