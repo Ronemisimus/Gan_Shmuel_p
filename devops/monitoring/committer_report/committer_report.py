@@ -18,24 +18,22 @@ def heath_test():
 
 @app.route('/committer_report', methods=['POST'])
 def log():
-   data = request.get_json()
 
-   commits = data['commits']
+    data = request.get_json()
+    commits = data['commits']
 
-   messages = ""
-   
-	for commit in commits:
-      messages.append("Commit Message: {}\n".format(commit["message"]))
+    messages = ""
+    for commit in commits:
+        messages += ("Commit id:{}, Message: {}\n".format(commit['id'], commit["message"]))
+    email_subject = "New Push By: {}".format(data['pusher']['name'])
 
-   email_subject = "New Push By: {}".format(data['pusher']['name'])
+    email = Message(email_subject, sender="gan.shmuel.ashdod@gmail.com", recipients=["eigorek@gmail.com"])
 
-   email = Message(email_subject, sender="gan.shmuel.ashdod@gmail.com", recipients=["eigorek@gmail.com"])
+    email.body = (messages)
 
-   email.body = message)
+    mail.send(email)
 
-   mail.send(email)
-   
-   return Response("200")
+    return Response("200")
 
 if __name__ == '__main__':
         app.run(host='0.0.0.0', port=8084, threaded=True, debug=True)
