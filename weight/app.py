@@ -1,11 +1,13 @@
 from flask import Flask, Request, Response
 from flask import request
+import datetime
+from time import gmtime, strftime
 import mysql.connector
 from mysql.connector import Error
 from insertions import read_json_file , read_csv_file
 app = Flask(__name__)
 
-def dbQuery(sql, isInsert):
+def dbQuery(sql, isInsert=None):
     mydb = mysql.connector.connect(
     host='db',
     database='weightDB',
@@ -55,8 +57,28 @@ def session(id):
 
 @app.route('/item/<id>' , methods=["GET"])
 def get_item(id):
-    # Read the instructions
-    return "OK"
+
+    # Get the id for an item(truck or container)   
+    transactionId = dbQuery('select * from TruckContainers where id={}'.format(id))
+    trackId = dbQuery('select * from Transactions where TruckID={}'.format(id))
+
+    # if truck or container does not exists
+    if not (transactionId or trackId):
+        return Response(status="404")
+    
+    # from time
+    t1 = request.args.get('from') if request.args.get('from') else  datetime.date.today().replace(day=1)
+    zero = datetime.time(0,00)
+    t1 = datetime.datetime.combine(t1 ,zero)
+
+    # to time
+    t2 = request.args.get('to') if request.args.get('to') else strftime("%Y-%m-%d %H:%M:%S", gmtime()) 
+
+
+    return "from - {} to - {} ".format(t1 , t2)
+    
+    
+    #return "OK"
 
 
 # @app.route("/weight", methods=['GET', 'POST'])
