@@ -1,5 +1,4 @@
-from flask import Flask, Request, Response
-from flask import request
+from flask import Flask, request, Response
 import mysql.connector
 from mysql.connector import Error
 from insertions import read_json_file , read_csv_file
@@ -59,26 +58,24 @@ def get_item(id):
     return "OK"
 
 
-# @app.route("/weight", methods=['GET', 'POST'])
-# def weight():
-#     if Request.method == 'POST':
-#         currtime = datetime.now()
-#         direction = Request.values.get('direction')
-#         truckID = Request.values.get('truckID')
-#         containerIDs = Request.values.get('containers')
-#         force = Request.values.get('username') or false
-#         produce = Request.values.get('produce')
+@app.route("/weight", methods=['GET', 'POST'])
+def weight():
+	if request.method == 'POST':
+		return "post"
+    #     currtime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    #     direction = Request.values.get('direction')
+    #     truckID = Request.values.get('truckID')
+    #     containerIDs = Request.values.get('containers')
+    #     force = Request.values.get('username') or false
+    #     produce = Request.values.get('produce')
+    #     if(direction == "in"):
+    #     	TransactionID = dbQuery("INSERT INTO Transactions (Status, TruckID, TimeIn) VALUES ('%s', '%s', '%s')"%(direction,truckID,currtime), True)
+    #     else:
+    #     	dbQuery("UPDATE Transactions SET TimeOut = %s WHERE TruckID = %s AND Status = 'in'"%(currtime,truckID),True)
 
-    # currtime = "1998-03-03 12:43:23"
-    # direction = "in"
-    # truckID = "T1ABD"
-    # containerIDs = "C1,C2"
-    # force = "false"
-    # produce = "Oranges,Potatoes"
-    # TransactionID = dbQuery("INSERT INTO Transactions (Status, TruckID, TimeIn) VALUES ('%s', '%s', '%s')"%(direction,truckID,currtime), True)
-    # test2= dbQuery("SELECT * FROM Transactions", False)
+	test2= dbQuery("SELECT * FROM Transactions", False)
 
-    # return str(test2[0][2])
+	return str(test2[0][2])
 
 if __name__ == '__main__':
     app.run(debug = True, host="0.0.0.0")
