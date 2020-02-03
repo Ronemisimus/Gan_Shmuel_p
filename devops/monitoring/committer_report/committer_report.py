@@ -32,9 +32,9 @@ def log():
 
    email = Message(email_subject, sender="gan.shmuel.ashdod@gmail.com", recipients=["eigorek@gmail.com"])
 
-   msg.body(messages)
+   email.body(messages)
 
-   mail.send(msg)
+   mail.send(email)
    
    return Response("200")
 
