@@ -40,6 +40,12 @@ def health():
 def batch_weight(filename):
     # Will upload list of tara weights from a file in "/in" folder. Usually used to accept a batch of new containers. 
     # File formats accepted: csv (id,kg), csv (id,lbs), json ([{"id":..,"weight":..,"unit":..},...])
+    if ".csv" in filename:
+        data = read_csv_file("in/" + filename)
+    if ".json" in filename:
+        data = read_json_file("in/" + filename)
+    for tuple in data:
+        dbQuery("INSERT INTO Containers (ID, Weight, Unit) VALUES ('"+ tuple[0] + "','" +  tuple[1] + "','" + tuple[2]+ "')", True)
     return "OK"
 
 @app.route('/unknown' , methods=["GET"])
