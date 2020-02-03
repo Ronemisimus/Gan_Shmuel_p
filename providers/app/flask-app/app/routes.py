@@ -41,6 +41,19 @@ def provider():
   else:
     res={'ID':provider_res.id}
     return Response(json.dumps(res),mimetype='application/json')
+@app.route('/provider/<provider_id>' , methods=['PUT'])
+def updateProvider(provider_id):
+  provider_new_name=request.args.get('provider_name')
+  if Provider.query.filter_by(name=provider_new_name).first() is None: 
+    search_provider_id=Provider.query.filter_by(id=provider_id).first()
+    if search_provider_id is None:
+      return Response(json.dumps("Provider {} is not exist! ".format(provider_id)),mimetype='application/json')
+    search_provider_id.name=provider_new_name
+    db.session.commit()
+    return Response(json.dumps("Provider {} new name is {}".format(search_provider_id.id,search_provider_id.name)),mimetype='application/json')
+  else:
+    return Response(json.dumps("Provider name {} already exist ,cant accpet new name!".format(provider_new_name)),mimetype='application/json')
+  
     
 @app.route('/truck', methods=['POST'])
 def truck():
@@ -48,7 +61,7 @@ def truck():
     truck_id = request.args.get('truck')
     res_provider = Provider.query.filter_by(id=provider_id).first()
     if res_provider is None:
-      return 'Provider ({}) Not Found'.format(provider_id)
+      return Response(json.dumps('Provider ({}) Not Found'.format(provider_id)),mimetype='application/json')
     try:
       new_truck = Truck(id=truck_id, provider_id=provider_id)
     except:
@@ -63,15 +76,14 @@ def truck():
 
 @app.route('/truck/<truck_id>', methods=['PUT'])
 def update_truck(truck_id):
-    print(truck_id)
     provider_id = request.args.get('provider_id')
     res_provider = Provider.query.filter_by(id=provider_id).first()
     if res_provider is None:
-      return 'Provider ({}) Not Found'.format(provider_id)
+      return Response(json.dumps('Provider ({}) Not Found'.format(provider_id)),mimetype='application/json')
     
     truck = Truck.query.filter_by(id=truck_id).first()
     if truck is None:
-      return 'Truck ({}) Not Found'.format(truck_id)
+      return Response(json.dumps('Truck ({}) Not Found'.format(truck_id)),mimetype='application/json')
       
     truck.provider_id = provider_id
     db.session.commit()
