@@ -22,6 +22,10 @@ mail = Mail(app)
 #    # mail.send(msg)
     
 
+@app.route('health', methods=['GET'])
+def heath_test():
+   return "committer report test"    
+
 @app.route('/committer_report', methods=['POST'])
 def log():
    data = request.get_json()
