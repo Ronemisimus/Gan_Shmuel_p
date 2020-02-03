@@ -2,6 +2,7 @@ from flask import Flask, request, Response
 import mysql.connector
 from mysql.connector import Error
 from insertions import read_json_file , read_csv_file
+import json
 app = Flask(__name__)
 
 def dbQuery(sql, isInsert):
@@ -73,9 +74,24 @@ def weight():
     #     else:
     #     	dbQuery("UPDATE Transactions SET TimeOut = %s WHERE TruckID = %s AND Status = 'in'"%(currtime,truckID),True)
 
-	test2= dbQuery("SELECT * FROM Transactions", False)
+	transactionID="35"
+	ContainersList=dbQuery('''SELECT t.id,t2.TruckID,t.Produce,(SUM(t.WeightProduce)+SUM(c.Weight)) AS Bruto,t.WeightProduce AS Neto
+	FROM
+		weightDB.TruckContainers t
+	INNER JOIN weightDB.Transactions t2 ON
+		t.TransactionID = t2.ID
+	INNER JOIN weightDB.Containers c ON
+		c.ID = t.ContainerID
+	WHERE
+		t.TransactionID = %s
+	GROUP BY t.id'''%transactionID,False)
+	# ContainersList=dbQuery("SELECT * FROM TruckContainers WHERE (TransactionID=%s)"%transactionID,False)
 
-	return str(test2[0][2])
+	rtn={}
+	for con in ContainersList:
+		rtn[str(con[0])] = {'truck':str(con[1]),'produce':str(con[2]),'bruto': str(con[3]),'neto':str(con[4])}
+
+	return rtn
 
 if __name__ == '__main__':
     app.run(debug = True, host="0.0.0.0")
