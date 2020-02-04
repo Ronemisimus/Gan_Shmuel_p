@@ -1,5 +1,5 @@
 import requests, json
-from flask import request, jsonify, Response, json
+from flask import request, jsonify, Response, json, redirect, url_for
 from app import app, db
 from app.models import Truck, Provider, Rate
 from datetime import datetime, timezone
@@ -20,18 +20,6 @@ def create_provider(provider_name):
     db.session.add(provider)
     db.session.commit()
     return provider
-  
-#Convert yyyymmsddhhmmss to datetime object
-def parse_time(t):
-  # override t1 if argument was not supplided and equal None
-  if not t:
-      # Default t1 time is 1st of month at 000000
-      year_format = datetime.date.today().replace(day=1)
-      zero = datetime.time(0,00)
-      t = datetime.datetime.combine(year_format ,zero)
-  else:
-      t = datetime.datetime.strptime(t , '%Y%m%d%H%M%S')
-  return t
 
 def test_health():
   try:
@@ -78,8 +66,8 @@ def updateProvider(provider_id):
     
 @app.route('/truck', methods=['POST'])
 def truck():
-  provider_id = request.args.get('provider_id')
-  truck_id = request.args.get('truck')
+  provider_id = request.form['provider_id']
+  truck_id = request.form['truck']
   res_provider = Provider.query.filter_by(id=provider_id).first()
   if res_provider is None:
     return Response(json.dumps('Provider ({}) Not Found'.format(provider_id)),mimetype='application/json', status=404)
@@ -101,7 +89,7 @@ def truck():
 @app.route('/truck/<truck_id>', methods=['GET', 'PUT'])
 def update_truck(truck_id):
     if request.method == 'PUT':
-      provider_id = request.args.get('provider_id')
+      provider_id = request.form['provider_id']
       res_provider = Provider.query.filter_by(id=provider_id).first()
       if res_provider is None:
         return Response(json.dumps('Provider ({}) Not Found'.format(provider_id)),mimetype='application/json')
@@ -120,14 +108,29 @@ def update_truck(truck_id):
     elif request.method == 'GET':
       truck = Truck.query.filter_by(id=truck_id).first()
       if truck is None:
-        return Response(status=404)
+        return Response('Truck ({}) Not Found'.format(truck_id), status=404)
 
-      from_date = request.args.get('from')
+      to_param = request.args.get('to')
+      if to_param is None or to_param == '':
+        to_param = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')
 
-      to_param = request.args.get('to') 
-      to_date = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S') if to_param is None else to_param
+      try:
+        from_date = str(datetime.strptime(str(request.args.get('from')), '%Y%m%d%H%M%S'))
+        to_date = str(datetime.strptime(str(to_param), '%Y%m%d%H%M%S'))
+      except Exception as e:
+        return Response(str(e), status=400)
       base_url = 'http://18.194.232.207:8088/'
       item_url = '{0}item/{1}'.format(base_url, truck.id)
-      res = requests.post(item_url, data={'form': from_date, 'to': to_date})
+      # try:
+      #   res = requests.get(item_url, data={'from': from_date, 'to': to_date})
+      # except Exception as e:
+      #   return Response(str(e))
 
-      return Response(res)
+      data = {
+        "id": "test_id",
+        "tara": 50,
+        "sessions": [14, 54, 60]
+      }
+      temp_json = json.dumps(data);
+      return Response(temp_json, mimetype="application/json")
+      # return Response(res, mimetype='application/json')
