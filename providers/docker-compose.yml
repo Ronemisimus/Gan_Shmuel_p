@@ -16,7 +16,7 @@ services:
     links:
       - db
   db:
-    build: "./db"
+    image: "mysql:5.7"
     command: "--explicit_defaults_for_timestamp=1"
     environment: 
       - "MYSQL_DATABASE=billdb"
@@ -27,5 +27,7 @@ services:
     volumes:
       - ./db/init:/docker-entrypoint-initdb.d/:ro
       - provider-db:/var/lib/mysql
+    expose: 
+      - "3306"
 volumes:
   provider-db:
