@@ -45,6 +45,7 @@ def gitWebHook():
 		# Load .env file as environment variables
 		load_dotenv('{}/.env'.format(compose_path), override=True)
 		os.environ['IMAGE_NAME'] = branch
+		os.environ['PWD'] = '/ci-test'
 		#os.environ['PWD'] = os.environ['PWD']+compose_path
 
 		# Build Dockerfile to get image artifact
