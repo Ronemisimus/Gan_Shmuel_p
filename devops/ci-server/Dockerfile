@@ -1,4 +1,4 @@
-FROM python:3.6-buster
+FROM python:3.6
 WORKDIR /ci-test
 RUN mkdir production
 RUN apt-get install docker && apt-get install docker-compose && apt-get install git
