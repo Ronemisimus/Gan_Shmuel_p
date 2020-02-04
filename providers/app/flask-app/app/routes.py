@@ -34,16 +34,19 @@ def parse_time(t):
       t = datetime.datetime.strptime(t , '%Y%m%d%H%M%S')
   return t
 
-# def test_truck():
-#   res = requests.post('http://18.194.232.207:8087/truck', data={'truck': 'tester', 'provider_id': 10001})
+def test_health():
+  try:
+    db.session.execute('select 1')
+    return Response(status=200)
+  except:
+    return Response(status=500)
+
+def test_truck():
+  res = requests.post('http://18.194.232.207:8086/truck', data={'truck': 'tester', 'provider_id': 10001})
 
 @app.route('/health')
 def health():
-  try:
-    db.session.execute('select 1')
-    return 'db is alive'
-  except:
-    return Response(status=500)
+  return test_health()
 @app.route('/')
 def home():
     return 'Home page'
@@ -64,7 +67,7 @@ def updateProvider(provider_id):
   if Provider.query.filter_by(name=provider_new_name).first() is None: 
     search_provider_id=Provider.query.filter_by(id=provider_id).first()
     if search_provider_id is None:
-      return Response(json.dumps("Provider {} is not exist! ".format(provider_id)),mimetype='application/json')
+      return Response("Provider {} is not exist! ".format(provider_id),mimetype='text/plain', status=404)
     search_provider_id.name=provider_new_name
     db.session.commit()
     return Response(json.dumps("Provider {} new name is {}".format(search_provider_id.id,search_provider_id.name)),mimetype='application/json')
@@ -78,13 +81,16 @@ def truck():
   truck_id = request.args.get('truck')
   res_provider = Provider.query.filter_by(id=provider_id).first()
   if res_provider is None:
-    return Response(json.dumps('Provider ({}) Not Found'.format(provider_id)),mimetype='application/json')
+    return Response(json.dumps('Provider ({}) Not Found'.format(provider_id)),mimetype='application/json', status=404)
   try:
     new_truck = Truck(id=truck_id, truck_provider=res_provider)
-  except:
-    return Response(status=500)
-  db.session.add(new_truck)
-  db.session.commit()
+  except Exception, e:
+    return Response(str(e), status=500)
+  try:
+    db.session.add(new_truck)
+    db.session.commit()
+  except Exception, e:
+    return Response(str(e), status=500)
   res_truck = {
     'id': new_truck.id,
     'provider_id': new_truck.provider_id
