@@ -32,7 +32,7 @@ def gitWebHook():
 		os.system('docker-compose -f {} restart'.format(compose_file))
 		return Response(200)
 	
-	if not branch == 'master':
+	if branch == 'weight' or branch == 'provider':
 		environment = 'test'
 
 		# Finding the Dockerfile
@@ -46,6 +46,7 @@ def gitWebHook():
 		# Load .env file as environment variables
 		load_dotenv('{}/.env'.format(compose_path), override=True)
 		os.environ['IMAGE_NAME'] = branch
+		os.environ['PWD'] = os.environ['PWD']+compose_path
 
 		# Build Dockerfile to get image artifact
 		os.system('docker build -t {} ./{}'.format(branch, docker_path))
@@ -55,7 +56,8 @@ def gitWebHook():
 
 		# MAIN TODO:
 		# End-2-End testing
-	else:
+	
+	if branch == 'master':
 		environment = 'prod'
 
 		# TODO: build all folders in master branch
