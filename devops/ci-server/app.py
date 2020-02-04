@@ -24,12 +24,14 @@ def gitWebHook():
 	os.system('rm -rf {}{}'.format(TESTING_DIR, branch))
 	os.system('git clone {} --single-branch -b {} {}{}'.format(REPOSITORY_URL, branch, TESTING_DIR, branch))
 
+	print('branch name: {}'.format(branch), file=sys.stderr)
 	if branch == 'devops':
-		os.system('docker-compose -f {}{}/devops/docker-compose.yml build'.format(TESTING_DIR, branch))
-		os.system('docker-compose -f {}{}/devops/docker-compose.yml restart'.format(TESTING_DIR, branch))
-		return Response(status=200)
+		compose_file = find('docker-compose.yml', '{}{}'.format(TESTING_DIR, branch))
 
-	if not branch == 'master':
+		os.system('docker-compose -f {} build'.format(compose_file))
+		return Response(200)
+	
+	if branch == 'weight' or branch == 'provider':
 		environment = 'test'
 
 		# Finding the Dockerfile
@@ -43,16 +45,20 @@ def gitWebHook():
 		# Load .env file as environment variables
 		load_dotenv('{}/.env'.format(compose_path), override=True)
 		os.environ['IMAGE_NAME'] = branch
+		#os.environ['PWD'] = os.environ['PWD']+compose_path
 
 		# Build Dockerfile to get image artifact
 		os.system('docker build -t {} ./{}'.format(branch, docker_path))
 
 		# Run the test build
+		#print('PWD: {}'.format(os.environ['PWD']), file=sys.stderr)
+		os.system('docker-compose -f {} config')
 		os.system('docker-compose -f {} -p {}-{} up -d'.format(compose_file, environment, branch))
 
 		# MAIN TODO:
 		# End-2-End testing
-	else:
+	
+	if branch == 'master':
 		environment = 'prod'
 
 		# TODO: build all folders in master branch
