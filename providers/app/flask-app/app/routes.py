@@ -134,7 +134,8 @@ def update_truck(truck_id):
 
 @app.route('/bill/<id>')
 def getBill(id):
-  if Provider.query.filter_by(id=id) is None:
+  provider_id=Provider.query.filter_by(id=id).first()
+  if provider_id is None:
     return Response(json.dumps('Provider ({}) Not Found'.format(id)),mimetype='application/json')
   else:
     provider_name=Provider.query.filter_by(id=id)
