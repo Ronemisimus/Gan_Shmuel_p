@@ -43,17 +43,23 @@ def health():
     else:
         return Response(status=500)
 
-@app.route('/batch-weight-file<string:filename>' , methods=["POST"])
-def batch_weight(filename):
-    # Will upload list of tara weights from a file in "/in" folder. Usually used to accept a batch of new containers. 
-    # File formats accepted: csv (id,kg), csv (id,lbs), json ([{"id":..,"weight":..,"unit":..},...])
-    if ".csv" in filename:
-        data = read_csv_file("in/" + filename)
-    if ".json" in filename:
-        data = read_json_file("in/" + filename)
-    for tuple in data:
-        dbQuery("INSERT INTO Containers (ID, Weight) VALUES ('"+ tuple[0] + "','" +  str(tuple[1]) +"')", True)
-    return "OK"
+@app.route('/batch-weight' , methods=["POST"])
+def batch_weight():
+    filename = request.form.get('filename')
+    try:
+        # Will upload list of tara weights from a file in "/in" folder. Usually used to accept a batch of new containers. 
+        # File formats accepted: csv (id,kg), csv (id,lbs), json ([{"id":..,"weight":..,"unit":..},...])
+        if ".csv" in filename:
+            data = read_csv_file("in/" + filename)
+        if ".json" in filename:
+            data = read_json_file("in/" + filename)
+        for tuple in data:
+            dbQuery("INSERT INTO Containers (ID, Weight) VALUES ('"+ tuple[0] + "','" +  str(tuple[1]) +"')", True)
+        return "OK inserted to db"
+    except:
+        return "file not found or it already in database", 404
+
+   
 
 @app.route('/unknown' , methods=["GET"])
 def unknown():
