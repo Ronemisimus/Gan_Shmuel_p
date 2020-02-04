@@ -54,7 +54,7 @@ def gitWebHook():
 		#print('PWD: {}'.format(os.environ['PWD']), file=sys.stderr)
 		os.system('cd {}'.format(compose_path))
 		os.system('docker-compose -p {}-{} up -d'.format(compose_file, environment, branch))
-		is.system('cd -')
+		os.system('cd -')
 
 		# MAIN TODO:
 		# End-2-End testing
