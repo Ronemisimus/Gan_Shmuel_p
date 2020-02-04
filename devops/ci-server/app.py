@@ -6,6 +6,7 @@ from time import sleep
 
 app = Flask(__name__)
 
+WORKDIR = '/ci-server'
 REPOSITORY_URL = 'https://github.com/ChrisPushkin/Gan_Shmuel_p.git'
 TESTING_DIR = 'test/'
 PRODUCTION_DIR = 'production/'
@@ -24,13 +25,16 @@ def gitWebHook():
 	os.system('rm -rf {}{}'.format(TESTING_DIR, branch))
 	os.system('git clone {} --single-branch -b {} {}{}'.format(REPOSITORY_URL, branch, TESTING_DIR, branch))
 
-	print('branch name: {}'.format(branch), file=sys.stderr)
+	'''
+	# TODO: CI for CI.
 	if branch == 'devops':
 		compose_file = find('docker-compose.yml', '{}{}'.format(TESTING_DIR, branch))
 
 		os.system('docker-compose -f {} build'.format(compose_file))
+		os.system('docker-compose restart')
 		return Response(200)
-	
+	'''
+
 	if branch == 'weight' or branch == 'provider':
 		environment = 'test'
 
@@ -44,21 +48,14 @@ def gitWebHook():
 
 		# Load .env file as environment variables
 		load_dotenv('{}/.env'.format(compose_path), override=True)
-		os.environ['IMAGE_NAME'] = branch
-		#os.environ['PWD'] = os.environ['PWD']+compose_path
 
 		# Build Dockerfile to get image artifact
 		os.system('docker build -t {} ./{}'.format(branch, docker_path))
 
 		# Run the test build
-		print('docker file: {}'.format(docker_file), file=sys.stderr)
-		print('docker path: {}'.format(docker_path), file=sys.stderr)
-		print('compose file: {}'.format(compose_file), file=sys.stderr)
-		print('compose_path: {}'.format(compose_path), file=sys.stderr)
 		os.chdir(compose_path)
-		os.system('ls -la')
 		os.system('docker-compose -p {}-{} up -d'.format(environment, branch))
-		os.chdir('/ci-test')
+		os.chdir(WORKDIR)
 
 		# MAIN TODO:
 		# End-2-End testing
