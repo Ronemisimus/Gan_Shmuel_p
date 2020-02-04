@@ -7,8 +7,7 @@ from time import sleep
 app = Flask(__name__)
 
 WORKDIR = '/ci-server'
-#REPOSITORY_URL = 'https://github.com/ChrisPushkin/Gan_Shmuel_p.git'
-REPOSITORY_URL = 'https://github.com/itzik-alayev/Gan_Shmuel_p'
+REPOSITORY_URL = 'https://github.com/ChrisPushkin/Gan_Shmuel_p.git'
 TESTING_DIR = 'test/'
 STAGE_DIR = 'stage/'
 PRODUCTION_DIR = 'production/'
