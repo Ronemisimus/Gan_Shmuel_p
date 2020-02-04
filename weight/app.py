@@ -119,6 +119,7 @@ def get_item(id):
     sesseions_array = []
     tara = int(sessions_result_list[0][1])
 
+    
     for result in sessions_result_list:
         sesseions_array.append(result[2])
     
