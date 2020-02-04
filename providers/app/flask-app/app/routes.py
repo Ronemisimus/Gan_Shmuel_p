@@ -158,9 +158,6 @@ def rates():
           data.append(new_rate)
         book.release_resources()
       try:
-        currContent=Rate.query.filter_by(True)
-        db.session.delete(currContent)
-        db.session.commit()
         db.session.add_all(data)
         db.session.commit()
       except:
