@@ -1,6 +1,9 @@
 from flask import Flask, request, Response
 import json
 from flask_mail import Mail, Message
+import os
+from time import gmtime, strftime
+import sched, time
 
 app = Flask(__name__)
 
@@ -10,41 +13,39 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = "gan.shmuel.ashdod@gmail.com"
 app.config['MAIL_PASSWORD'] = "nA@UemKJPlo0GjperLN4"
 
+email_recipients = ["eigorek@gmail.com"]
+
 mail = Mail(app)
 
-@app.route('/health', methods=['GET'])
-def heath_test():
-    return Response(status=200)
+def log_entry(entry, log_name):
+    with open(os.getcwd() + "/" + log_name, "a+") as log:
+        log.write(strftime("%B %d, %Y %H:%M:%S (UTC)\n", gmtime()))
+        log.write(entry)
+        log.write("\n********************************************************")
 
-@app.route('/committer_report', methods=['POST'])
-def log():
+def send_email(subject, messages, log_name):
+    email = Message(subject, sender="gan.shmuel.ashdod@gmail.com", recipients=email_recipients)
+    email.body = messages
 
-    data = request.get_json()
-
-
-    pusher_email = data['pusher']['email']
-
-    
-
-
-    commits = data['commits']
-
-    messages = ""
-    for commit in commits:
-        messages += ("Commit id:{}\nMessage: {}\n\n".format(commit['id'], commit["message"]))
-    email_subject = "New Push By: {}".format(data['pusher']['name'])
-
-    email = Message(email_subject, sender="gan.shmuel.ashdod@gmail.com", recipients=["eigorek@gmail.com", "chrispushkin@gmail.com"])
-
-    email.body = (messages)
-
-    os.system('docker ps -q | xargs -L 1 docker logs > log.txt')  
-    with current_app.open_resource("log.txt") as fp:
-        msg.attach("log.txt", "text/plain", fp.read())
+    with app.open_resource(os.getcwd() + "/" + log_name) as fp:
+        email.attach("log.txt", "text/plain", fp.read())
 
     mail.send(email)
+
+@app.route('/committer_report', methods=['POST'])
+def log():   
+    data = request.get_json()
+
+    messages = ""
+    for commit in data['commits']:
+        messages += ("Commit id:{}\nMessage: {}\n\n".format(commit['id'], commit["message"]))
+
+    entry = "New Push From {}".format(data['pusher']['name'])
+
+    log_entry("\n" + entry + "\n\n" + messages, "log.txt")
+    send_email(entry, messages, "log.txt")    
 
     return Response("200")
 
 if __name__ == '__main__':
-        app.run(host='0.0.0.0', port=8084, threaded=True, debug=True)
+    app.run(host='0.0.0.0', port=8084, threaded=True, debug=True)
