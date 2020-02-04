@@ -224,7 +224,7 @@ def weight():
 	else:
 		filt = "('in','out','none')"
 
-	sql='''SELECT t2.TransactionID, t.Status, (SUM(t2.WeightProduce) + SUM(c.Weight)) AS bruto, SUM(t2.WeightProduce) AS neto, GROUP_CONCAT(DISTINCT t2.Produce) AS products, GROUP_CONCAT(DISTINCT t2.ContainerID) AS Containers
+	sql='''SELECT t2.TransactionID, t.Status, (SUM(t2.WeightProduce) + SUM(c.Weight) + t.LastWeight) AS bruto, SUM(t2.WeightProduce) AS neto, GROUP_CONCAT(DISTINCT t2.Produce) AS products, GROUP_CONCAT(DISTINCT t2.ContainerID) AS Containers
 	FROM
 		weightDB.Transactions t
 	INNER JOIN weightDB.TruckContainers t2 ON
