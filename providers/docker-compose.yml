@@ -27,7 +27,7 @@ services:
       - "DATABASE_URL=/var/lib/mysql"
     volumes:
       - ${PWD}/db/init:/db/init
-      - ${PWD}/db/init:/docker-entrypoint-initdb.d:rw
+      - ${PWD}/db/init:/docker-entrypoint-initdb.d:ro
       - provider-db:/var/lib/mysql
     expose: 
       - ${DB_EXPOSE}
