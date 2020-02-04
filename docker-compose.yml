@@ -13,7 +13,9 @@ services:
       - "5000"
     environment:
       - "FLASK_APP=app.py"
-  
+      - "IMAGE_NAME=${IMAGE_NAME}"
+      - "PROD_PORT=${PROD_PORT}"
+      - "TEST_URL=${TEST_URL}"
   db:
     image: mysql:8.0
     ports:
