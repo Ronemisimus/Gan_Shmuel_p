@@ -121,11 +121,11 @@ def update_truck(truck_id):
       if truck is None:
         return Response(status=404)
 
-      from_date = parse_time(request.args.get('from'))
+      from_date = request.args.get('from')
 
       to_param = request.args.get('to') 
       to_date = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S') if to_param is None else to_param
-      base_url = 'http://18.194.232.207:8089/'
+      base_url = 'http://18.194.232.207:8088/'
       item_url = '{0}item/{1}'.format(base_url, truck.id)
       res = requests.post(item_url, data={'form': from_date, 'to': to_date})
 
