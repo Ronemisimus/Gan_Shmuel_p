@@ -133,7 +133,8 @@ def update_truck(truck_id):
       return Response(res,mimetype='application/json')
 @app.route('/bill/<id>')
 def getBill(id):
-  if Provider.query.filter_by(id=id) is None:
+  provider_id=Provider.query.filter_by(id=id).first()
+  if provider_id is None:
     return Response(json.dumps('Provider ({}) Not Found'.format(id)),mimetype='application/json')
   else:
     provider_name=Provider.query.filter_by(id=id)
@@ -146,9 +147,10 @@ def getBill(id):
     to_param=request.args.get('to')
     to_date = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S') if to_param is None else to_param
     trucks_of_provider=Truck.query.filter_by(provider_id=id).all()
+    print(type(trucks_of_provider))
     for truck in trucks_of_provider:
       truck_count+=1
-      res=request.get('http://18.194.232.207:8086/truck/'+truck, data ={'from':from_date ,'to':to_date})
+      res=request.get('http://localhost:8086/truck/'+truck, data ={'from':from_date ,'to':to_date})
     # { 
     # "id": <str>,
 	  # "tara": <int>, // last known tara in kg
@@ -200,11 +202,18 @@ def getBill(id):
       if Rate.query.filter_by(product_id=key , scope=id) is None:
         rate=Rate.query.filter_by(product_id=key , scope=id)
       else:
-        rate=Rate.query.filter_by(product_id=key , scope='ALL')
+        rate=Rate.query.filter_by(product_id=key , scope='ALL').first()
       product_details={'product':key ,'count':product_session_count[key],'amount':product_amount[key],'rate':rate,'pay':(rate*product_amount[key])}
       total_pay+=product_details['pay']
       products_list.append(product_details)
-    res_data = {'ID':id ,'Name':provider_name,'From':from_date,'To':to_date,'Truck_count':truck_count,'Session_Count':session_count,'Products':products_list,'Total':total_pay}
+    res_data = {'ID':id ,
+    'Name':provider_name,
+    'From':from_date,
+    'To':to_date,
+    'Truck_count':truck_count,
+    'Session_Count':session_count,
+    'Products':products_list,
+    'Total':total_pay}
   return Response(json.dumps(res_data),mimetype='application/json')
 
 
