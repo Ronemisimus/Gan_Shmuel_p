@@ -24,7 +24,7 @@ def gitWebHook():
 	os.system('rm -rf {}{}'.format(TESTING_DIR, branch))
 	os.system('git clone {} --single-branch -b {} {}{}'.format(REPOSITORY_URL, branch, TESTING_DIR, branch))
 
-	print('branch name: {}'.format(branch))
+	print('branch name: {}'.format(branch), file=sys.stderr)
 	if branch == 'devops':
 		compose_file = find('docker-compose.yml', '{}{}'.format(TESTING_DIR, branch))
 
