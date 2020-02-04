@@ -1,10 +1,11 @@
-from flask import Flask, request, Response
+from flask import Flask, request, Response, render_template, send_from_directory
 from datetime import datetime , time 
 from time import gmtime, strftime
 import mysql.connector
 from mysql.connector import Error
 from insertions import read_json_file , read_csv_file
 import json
+import os
 app = Flask(__name__)
 
 def dbQuery(sql, isInsert=None):
@@ -27,6 +28,11 @@ def dbQuery(sql, isInsert=None):
 # Todo: See how we can instantiate the DB only once , and pass it to app.py
 def check_db_status(host='db',database='weightDB',user='user',password='alpine'):
     return mysql.connector.connect(password='alpine', user='root', host='db', port='3306', database='weightDB' ,  auth_plugin='mysql_native_password')
+
+@app.route("/favicon.ico", methods=["GET"])
+def favicon():
+        return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 # Entery points
 @app.route("/")
@@ -176,6 +182,10 @@ def weight():
 			rtn[str(tran[0])] = {'direction':str(tran[1]),'bruto':str(tran[2]),'neto': str(tran[3]),'produces':str(tran[4]),'containers':str(tran[5])}
 
 		return rtn
+
+@app.route("/input", methods=['GET'])
+def input():
+	return render_template('weight_form.html')
 
 if __name__ == '__main__':
     app.run(debug = True, host="0.0.0.0")
