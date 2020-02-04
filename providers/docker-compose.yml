@@ -15,6 +15,8 @@ services:
       - ${PORT}:${APP_EXPOSE}
     links:
       - db
+    volumes: 
+      - ./app/flask-app/in:/flask-app/in
   db:
     image: "mysql:5.7"
     command: "--explicit_defaults_for_timestamp=1"
