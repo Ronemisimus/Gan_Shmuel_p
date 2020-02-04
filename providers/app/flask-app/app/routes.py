@@ -128,6 +128,90 @@ def update_truck(truck_id):
       to_date = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S') if to_param is None else to_param
       base_url = 'http://18.194.232.207:8088/'
       item_url = '{0}item/{1}'.format(base_url, truck.id)
-      res = requests.post(item_url, data={'form': from_date, 'to': to_date})
+      res = requests.post(item_url, data={'from': from_date, 'to': to_date})
 
-      return Response(res)
+      return Response(res,mimetype='application/json')
+@app.route('/bill/<id>')
+def getBill(id):
+  if Provider.query.filter_by(id=id) is None:
+    return Response(json.dumps('Provider ({}) Not Found'.format(id)),mimetype='application/json')
+  else:
+    provider_name=Provider.query.filter_by(id=id)
+    product_amount = {}
+    product_session_count = {}
+    products_list=[]
+    truck_count=0
+    session_count=0
+    from_date=request.args.get('from')
+    to_param=request.args.get('to')
+    to_date = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S') if to_param is None else to_param
+    trucks_of_provider=Truck.query.filter_by(provider_id=id).all()
+    for truck in trucks_of_provider:
+      truck_count+=1
+      res=request.get('http://18.194.232.207:8086/truck/'+truck, data ={'from':from_date ,'to':to_date})
+    # { 
+    # "id": <str>,
+	  # "tara": <int>, // last known tara in kg
+	  # "sessions": [ <id1>,...] 
+    #     }
+      for session in res['sessions']:
+        session_count+=1
+        res_session=request.get('http://18.194.232.207:8088/session/'+session)
+        # method get session id and return json in format:
+    # [{
+    # 	"id": "<id>",
+    # 	"truckID": "<truck id>",
+    # 	"items":
+    #  [{
+    # 		"produce": "<type of produce>",
+    # 		"bruto": "<weight bruto>",
+    # 		"neto": "<weight_neto| null>"
+    # 	}]
+    # }]
+        for product in res_session['items']:
+          if product['produce'] in product_session_count:
+            product_session_count[product['produce']]+=1
+          else:
+            product_session_count[product['produce']]=1
+          if product in product_amount:
+            product_amount[product['produce']]+=product['neto']
+          else:
+            product_amount[product['produce']]=product_amount[product['produce']]
+
+  #  {
+	#   "id": <str>,
+	#   "name": <str>,
+	#   "from": <str>,
+	#   "to": <str>,
+	#   "truckCount": <int>,
+	#   "sessionCount": <int>,
+	#   "products": [
+	#     { "product":<str>,
+	#       "count": <str>, // number of sessions
+	#       "amount": <int>, // total kg
+	#       "rate": <int>, // agorot
+	#       "pay": <int> // agorot
+	#     },...
+	#   ],
+	#   "total": <int> // agorot
+	# }
+    total_pay=0
+    for key in product_session_count:
+      if Rate.query.filter_by(product_id=key , scope=id) is None:
+        rate=Rate.query.filter_by(product_id=key , scope=id)
+      else:
+        rate=Rate.query.filter_by(product_id=key , scope='ALL')
+      product_details={'product':key ,'count':product_session_count[key],'amount':product_amount[key],'rate':rate,'pay':(rate*product_amount[key])}
+      total_pay+=product_details['pay']
+      products_list.append(product_details)
+    res_data = {'ID':id ,'Name':provider_name,'From':from_date,'To':to_date,'Truck_count':truck_count,'Session_Count':session_count,'Products':products_list,'Total':total_pay}
+  return Response(json.dumps(res_data),mimetype='application/json')
+
+
+
+
+
+
+
+
+
