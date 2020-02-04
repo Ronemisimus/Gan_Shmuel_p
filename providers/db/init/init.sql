@@ -20,8 +20,9 @@ CREATE TABLE IF NOT EXISTS `Provider` (
 CREATE TABLE IF NOT EXISTS `Rates` (
   `product_id` varchar(50) NOT NULL,
   `rate` int(11) DEFAULT 0,
-  `scope` varchar(50) DEFAULT NULL,
-  FOREIGN KEY (scope) REFERENCES `Provider`(`id`)
+  `scope` varchar(50) DEFAULT 'ALL',
+  FOREIGN KEY (scope) REFERENCES `Provider`(`id`),
+  CONSTRAINT PK_Product_Scope PRIMARY KEY (product_id, scope)
 ) ENGINE=MyISAM AUTO_INCREMENT=10001 ;
 
 CREATE TABLE IF NOT EXISTS `Trucks` (
