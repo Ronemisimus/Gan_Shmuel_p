@@ -15,18 +15,19 @@ def find(name, path):
         if name in files:
             return os.path.join(root, name)
 
+
 @app.route('/payload', methods=['POST'])
 def gitWebHook():
 	data = request.get_json()
 	branch = data['ref'].split('/')[-1]
 
-	if branch == 'devops':
-		os.system('git pull')
-		os.system('docker-compose -f ../ up --build -d')
-		return Response(status=200)
-
 	os.system('rm -rf {}{}'.format(TESTING_DIR, branch))
 	os.system('git clone {} --single-branch -b {} {}{}'.format(REPOSITORY_URL, branch, TESTING_DIR, branch))
+
+	if branch == 'devops':
+		os.system('docker-compose -f {}{}/devops/docker-compose.yml build'.format(TESTING_DIR, branch))
+		os.system('docker-compose -f {}{}/devops/docker-compose.yml restart'.format(TESTING_DIR, branch))
+		return Response(status=200)
 
 	if not branch == 'master':
 		environment = 'test'
