@@ -8,6 +8,7 @@ services:
       - "8085:8085"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./ci-server/test:/ci-test/test
 
   committer-report:
     build: ./monitoring/committer_report
