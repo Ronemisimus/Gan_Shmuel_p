@@ -4,12 +4,6 @@ from app import app, db
 from app.models import Truck, Provider, Rate
 from datetime import datetime, timezone
 
-# comment init
-def format_providers(providers):
-  data = ''
-  for provider in providers:
-    data += 'ID: [{0}] - {1}: \n'.format(provider.id, provider.name)
-  return data
 
 def create_provider(provider_name):
   provider = Provider(name=provider_name)
@@ -29,9 +23,6 @@ def test_health():
     return Response(res_str, status=200)
   except:
     return Response(status=500)
-
-def test_truck():
-  res = requests.post('http://18.194.232.207:8086/truck', data={'truck': 'tester', 'provider_id': 10001})
 
 @app.route('/health')
 def health():
