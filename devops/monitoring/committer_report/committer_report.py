@@ -20,6 +20,13 @@ def heath_test():
 def log():
 
     data = request.get_json()
+
+
+    pusher_email = data['pusher']['email']
+
+    
+
+
     commits = data['commits']
 
     messages = ""
@@ -30,6 +37,10 @@ def log():
     email = Message(email_subject, sender="gan.shmuel.ashdod@gmail.com", recipients=["eigorek@gmail.com", "chrispushkin@gmail.com"])
 
     email.body = (messages)
+
+    os.system('docker ps -q | xargs -L 1 docker logs > log.txt')  
+    with current_app.open_resource("log.txt") as fp:
+        msg.attach("log.txt", "text/plain", fp.read())
 
     mail.send(email)
 
