@@ -3,6 +3,7 @@ from flask import request, jsonify, Response, json
 from app import app, db
 from app.models import Truck, Provider, Rate
 from datetime import datetime, timezone
+import xlrd, os
 
 # comment init
 def format_providers(providers):
@@ -129,8 +130,8 @@ def update_truck(truck_id):
       base_url = 'http://18.194.232.207:8088/'
       item_url = '{0}item/{1}'.format(base_url, truck.id)
       res = requests.post(item_url, data={'from': from_date, 'to': to_date})
-
       return Response(res,mimetype='application/json')
+
 @app.route('/bill/<id>')
 def getBill(id):
   if Provider.query.filter_by(id=id) is None:
@@ -209,7 +210,45 @@ def getBill(id):
 
 
 
+@app.route('/rates', methods=['GET' , 'POST'])
+def rates():
+    if request.method=='GET':
+      return "Boo!!! O_O"      
 
+    elif request.method=='POST':
+      filename=request.form['file']
+      try:
+        book = xlrd.open_workbook(os.getcwd()+'/in/'+filename+'.xlsx', on_demand=True)
+      except:
+          print ("File doesn't exists in '/in' folder.")
+          return Response(status=404)
+      else: ## Case file was opend successfuly
+        sheet = book.sheet_by_index(0) ## DOTO: change to find sheet  by name
+        for i in range(1,sheet.nrows):
+          for j in range(sheet.ncols):
+            if j==0:
+              product=str(sheet.cell(i,j).value )
+            elif j==1:
+              rate = int(sheet.cell(i,j).value )
+            elif j==2:
+              scope = str(sheet.cell(i,j).value )
+          new_rate_candidate=Rate.query.filter_by(product_id=product, scope=scope).first()
+          print('{}'.format(new_rate_candidate))
+          if new_rate_candidate is None:
+            new_rate = Rate(product_id=product,rate=rate,scope=scope)
+            try:
+              db.session.add(new_rate)
+              db.session.commit()
+            except:
+              print ("Coldn't insert data to billdb.table 'Rates'")
+              return Response(status=500)
+          else:
+            new_rate_candidate.rate=rate
+            db.session.commit()
+            print("bla")
+
+        book.release_resources()
+        return 'Done'
 
 
 
