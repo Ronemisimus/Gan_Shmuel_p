@@ -20,6 +20,7 @@ services:
   db:
     image: "mysql:5.7"
     command: "--explicit_defaults_for_timestamp=1"
+    restart: always
     environment: 
       - "MYSQL_DATABASE=${DB_DATABASE}"
       - "MYSQL_USER=${DB_USER}"
@@ -28,7 +29,7 @@ services:
       - "DATABASE_URL=/var/lib/mysql"
     volumes:
       - ${PWD}/db/init:/db/init
-      - ${PWD}/db/init:/docker-entrypoint-initdb.d
+      - ${PWD}/db/init:/docker-entrypoint-initdb.d:rw
       - provider-db:/var/lib/mysql
     expose: 
       - ${DB_EXPOSE}
