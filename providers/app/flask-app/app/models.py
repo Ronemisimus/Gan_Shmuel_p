@@ -22,7 +22,7 @@ class Rate(db.Model):
     __tablename__ = 'Rates'
     product_id = db.Column(db.String(50), primary_key=True)
     rate = db.Column(db.Integer)
-    scope = db.Column(db.String(50), db.ForeignKey('Provider.id'))
+    scope = db.Column(db.String(50), db.ForeignKey('Provider.id'), primary_key=True)
     
     @property
     def serialize(self):

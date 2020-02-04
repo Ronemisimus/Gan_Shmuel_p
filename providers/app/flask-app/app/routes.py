@@ -144,10 +144,9 @@ def rates():
         book = xlrd.open_workbook(os.getcwd()+'/in/'+filename+'.xlsx', on_demand=True)
       except:
           print ("File doesn't exists in '/in' folder.")
-          return Response(status=500)
-      else:
-        data = []
-        sheet = book.sheet_by_index(0)
+          return Response(status=404)
+      else: ## Case file was opend successfuly
+        sheet = book.sheet_by_index(0) ## DOTO: change to find sheet  by name
         for i in range(1,sheet.nrows):
           for j in range(sheet.ncols):
             if j==0:
@@ -156,13 +155,20 @@ def rates():
               rate = int(sheet.cell(i,j).value )
             elif j==2:
               scope = str(sheet.cell(i,j).value )
-          new_rate = Rate(product_id=product,rate=rate,scope=scope)
-          data.append(new_rate)
+          new_rate_candidate=Rate.query.filter_by(product_id=product, scope=scope).first()
+          print('{}'.format(new_rate_candidate))
+          if new_rate_candidate is None:
+            new_rate = Rate(product_id=product,rate=rate,scope=scope)
+            try:
+              db.session.add(new_rate)
+              db.session.commit()
+            except:
+              print ("Coldn't insert data to billdb.table 'Rates'")
+              return Response(status=500)
+          else:
+            new_rate_candidate.rate=rate
+            db.session.commit()
+            print("bla")
+
         book.release_resources()
-      try:
-        db.session.add_all(data)
-        db.session.commit()
-      except:
-          print ("Coldn't insert to DB")
-          return Response(status=500)
-      return 'Done'
+        return 'Done'
