@@ -52,6 +52,8 @@ def gitWebHook():
 		os.system('docker build -t {} ./{}'.format(branch, docker_path))
 
 		# Run the test build
+		print('PWD: {}'.format(os.environ['PWD']), file=sys.stderr)
+		os.system('docker-compose -f {} config')
 		os.system('docker-compose -f {} -p {}-{} up -d'.format(compose_file, environment, branch))
 
 		# MAIN TODO:
