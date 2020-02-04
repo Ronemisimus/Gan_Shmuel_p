@@ -26,11 +26,10 @@ def gitWebHook():
 
 	if branch == 'devops':
 		compose_file = find('docker-compose.yml', '{}{}'.format(TESTING_DIR, branch))
+		
 		os.system('docker-compose -f {} build'.format(compose_file))
 		os.system('docker-compose -f {} restart'.format(compose_file))
-		return Response(status=200)
-
-	if not branch == 'master':
+	elif not branch == 'master':
 		environment = 'test'
 
 		# Finding the Dockerfile
