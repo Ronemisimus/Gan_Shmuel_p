@@ -25,8 +25,9 @@ def gitWebHook():
 	os.system('git clone {} --single-branch -b {} {}{}'.format(REPOSITORY_URL, branch, TESTING_DIR, branch))
 
 	if branch == 'devops':
-		os.system('docker-compose -f {}{}/devops/docker-compose.yml build'.format(TESTING_DIR, branch))
-		os.system('docker-compose -f {}{}/devops/docker-compose.yml restart'.format(TESTING_DIR, branch))
+		compose_file = find('docker-compose.yml', '{}{}'.format(TESTING_DIR, branch))
+		os.system('docker-compose -f {} build'.format(compose_file))
+		os.system('docker-compose -f {} restart'.format(compose_file))
 		return Response(status=200)
 
 	if not branch == 'master':
