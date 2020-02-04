@@ -29,7 +29,6 @@ def gitWebHook():
 		compose_file = find('docker-compose.yml', '{}{}'.format(TESTING_DIR, branch))
 
 		os.system('docker-compose -f {} build'.format(compose_file))
-		os.system('docker-compose -f {} restart'.format(compose_file))
 		return Response(200)
 	
 	if branch == 'weight' or branch == 'provider':
