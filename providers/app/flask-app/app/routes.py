@@ -83,10 +83,13 @@ def truck():
     return Response(json.dumps('Provider ({}) Not Found'.format(provider_id)),mimetype='application/json', status=404)
   try:
     new_truck = Truck(id=truck_id, truck_provider=res_provider)
+  except Exception, e:
+    return Response(str(e), status=500)
+  try:
     db.session.add(new_truck)
     db.session.commit()
   except Exception, e:
-    return Response(status=500)
+    return Response(str(e), status=500)
   res_truck = {
     'id': new_truck.id,
     'provider_id': new_truck.provider_id
