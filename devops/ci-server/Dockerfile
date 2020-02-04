@@ -1,7 +1,7 @@
-FROM python:3.6-alpine
+FROM python:3.6-buster
 WORKDIR /ci-test
 RUN mkdir production
-RUN apk add docker && apk add docker-compose && apk add git && apk add bash
+RUN apt-get install docker && apt-get install docker-compose && apt-get install git
 RUN pip install flask && pip install python-dotenv
 COPY app.py .
 
