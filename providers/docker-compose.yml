@@ -26,13 +26,13 @@ services:
       - "DATABASE_URL=/var/lib/mysql"
     volumes:
       - ${PWD}/db/init:/db/init
-      - ${PWD}/db/init:/docker-entrypoint-initdb.d
+      - init-sql:/docker-entrypoint-initdb.d
       - provider-db:/var/lib/mysql
     expose: 
       - ${DB_EXPOSE}
 volumes:
   provider-db:
-  initsql:
+  init-sql:
     driver_opts: 
       type: none
       device: ${PWD}/db/init
