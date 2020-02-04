@@ -27,9 +27,10 @@ services:
       - "MYSQL_ROOT_PASSWORD=root"
       - "DATABASE_URL=/var/lib/mysql"
     volumes:
-      - ./db/init:/docker-entrypoint-initdb.d/:ro
+      - ${PWD}/db/init:/db/init
+      - ${PWD}/db/init:/docker-entrypoint-initdb.d
       - provider-db:/var/lib/mysql
     expose: 
-      - "${DB_EXPOSE}"
+      - ${DB_EXPOSE}
 volumes:
   provider-db:

@@ -36,8 +36,10 @@ def parse_time(t):
 
 def test_health():
   try:
-    db.session.execute('select 1')
-    return Response(status=200)
+    res = db.session.execute('show tables')
+    res_str = res.fetchall()
+    res_str = str(res_str)
+    return Response(res_str, status=200)
   except:
     return Response(status=500)
 
