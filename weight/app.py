@@ -126,39 +126,73 @@ def get_item(id):
     if not id:
         return Response(status=404) 
 
-    t1 = request.args.get('from')
-    t1 = parse_time(t1)
 
-    t2 = request.args.get('to')
-    
-    # override the t2 time
-    if not t2:
-        t2 = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-    else:
-        t2 = datetime.strptime(t2 , '%Y%m%d%H%M%S')
+    try:
+        #if id is int dealing with containers
+        id = int(id)
+        ans = dbQuery("SELECT * FROM TruckContainers where id = {} ".format(id), isInsert=False)
+       
+        #if id is not exist
+        if not len(ans):
+            return Response(status = 404)  
+        
 
-    sessions_result_list = dbQuery('''SELECT t.TruckID, SUM(t2.WeightProduce), t.ID
-    FROM
-        weightDB.Transactions t
-    INNER JOIN weightDB.TruckContainers t2 ON
-        t2.TransactionID = t.ID
-    WHERE
-        t.TruckID = "{}"
-        AND t.TimeIn >= STR_TO_DATE('{}','%Y-%m-%d %T')
-        AND t.TimeOut <= STR_TO_DATE('{}','%Y-%m-%d %T')
-    GROUP BY
-        t.ID'''.format(str(id),str(t1),str(t2)))
+        data =dbQuery('''SELECT
+                        t2.id,
+                        t2.WeightProduce,
+                        t2.TransactionID
+                    FROM
+                        weightDB.TruckContainers t2
+                    INNER JOIN weightDB.Transactions t ON
+                    t2.TransactionID = t.ID
+                    WHERE
+                    t.TimeIn >= STR_TO_DATE('1997-12-01 12:00:00',
+                    '%Y-%m-%d %T')
+                    AND t.TimeOut <= STR_TO_DATE('2021-12-01 12:00:00',
+                    '%Y-%m-%d %T')
+                    AND t2.id = {};'''.format(id), isInsert=False)
+        
+        return {"id":str(id) , "tara":data[0][1] , "sessions":data[0][2]}
+        
 
-    if not len(sessions_result_list):
-        return {}
 
-    sesseions_array = []
-    tara = int(sessions_result_list[0][1])
 
-    for result in sessions_result_list:
-        sesseions_array.append(result[2])
-    
-    return {"id":str(id) , "tara":tara , "sessions":sesseions_array}
+        
+    except:
+        #id is a string, dealing with trucks
+        t1 = request.args.get('from')
+        t1 = parse_time(t1)
+
+        t2 = request.args.get('to')
+        
+        # override the t2 time
+        if not t2:
+            t2 = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+        else:
+            t2 = datetime.strptime(t2 , '%Y%m%d%H%M%S')
+
+        sessions_result_list = dbQuery('''SELECT t.TruckID, SUM(t2.WeightProduce), t.ID
+        FROM
+            weightDB.Transactions t
+        INNER JOIN weightDB.TruckContainers t2 ON
+            t2.TransactionID = t.ID
+        WHERE
+            t.TruckID = "{}"
+            AND t.TimeIn >= STR_TO_DATE('{}','%Y-%m-%d %T')
+            AND t.TimeOut <= STR_TO_DATE('{}','%Y-%m-%d %T')
+        GROUP BY
+            t.ID'''.format(str(id),str(t1),str(t2)))
+
+        if not len(sessions_result_list):
+            return {}
+
+        sesseions_array = []
+        tara = int(sessions_result_list[0][1])
+
+        for result in sessions_result_list:
+            sesseions_array.append(result[2])
+        
+        return {"id":str(id) , "tara":tara , "sessions":sesseions_array}
         
 
 @app.route("/weight", methods=['GET', 'POST'])
