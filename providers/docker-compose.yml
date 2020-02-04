@@ -32,3 +32,8 @@ services:
       - ${DB_EXPOSE}
 volumes:
   provider-db:
+  initsql:
+    driver_opts: 
+      type: none
+      device: ${PWD}/db/init
+      o: bind
