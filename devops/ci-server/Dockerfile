@@ -1,5 +1,5 @@
 FROM python:3.6-alpine
-WORKDIR /ci-test
+WORKDIR /ci-server
 RUN mkdir production
 RUN apk add docker && apk add docker-compose && apk add git && apk add bash
 RUN pip install flask && pip install python-dotenv
