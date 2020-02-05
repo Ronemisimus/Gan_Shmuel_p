@@ -98,6 +98,7 @@ def test():
     elif pusher in devops_group:
         recipients = ["chrispushkin@gmail.com", pushers_email]
         # recipients = ["eigorek@gmail.com"]
+        #
 
     entry = "Tests and Commits Reports for {}'s Latest Push".format(data['pusher']['name'])
 
