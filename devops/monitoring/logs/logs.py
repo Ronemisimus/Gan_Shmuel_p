@@ -13,24 +13,30 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = "gan.shmuel.ashdod@gmail.com"
 app.config['MAIL_PASSWORD'] = "nA@UemKJPlo0GjperLN4"
 
-weight_group = [
-    "nati-elmaliach",
-    "Aransh",
-    "ozshm",
-    "KateDvo" 
-]
-
-providers_group = {
-    "M-Wittner",
-    "RonBenMoshe",
-    "Neta182" 
+weight_team = {
+    "nati-elmaliach" : "natielmaliach3197@gmail.com",
+    "Aransh" : "aranshavit@gmail.com",
+    "ozshm" : "ozshmuel@gmail.com",
+    "KateDvo" : "kate.dvoretsky@gmail.com"
 }
 
-devops_group = {
-    "IgorEnenberg",
-    "itzik-alayev",
-    "ChrisPushkin" 
+weight_team_lead = "nati-elmaliach"
+
+providers_team = {
+    "M-Wittner" : "Matan.wittner@gmail.com",
+    "RonBenMoshe" : "RonBenMoshe@gmail.com",
+    "Neta182" : "Netaba@mta.ac.il"
 }
+
+providers_team_lead = "RonBenMoshe"
+
+devops_team = {
+    "IgorEnenberg" : "eigorek@gmail.com",
+    "itzik-alayev" : "",
+    "ChrisPushkin" : "chrispushkin@gmail.com"
+}
+
+devops_team_lead = "ChrisPushkin"
 
 mail = Mail(app)
 
@@ -81,7 +87,7 @@ def tests_report(data):
     log_entry("\n" + entry + "\n\n" + messages, "test_log.txt")
 
 @app.route('/log', methods=['POST'])
-def test():
+def log():
     data = request.get_json()
     commits_report(data)
     tests_report(data)   
@@ -89,21 +95,24 @@ def test():
     pushers_email = "{}".format(data['pusher']['email'])
     pusher = "{}".format(data['pusher']['name'])
     recipients = []
-    if pusher in weight_group:
-        recipients = ["natielmaliach3197@gmail.com", pushers_email]
-        # recipients = ["eigorek@gmail.com"]
-    elif pusher in providers_group:
-        recipients = ["ronmoshe333@gmail.com", pushers_email]
-        # recipients = ["eigorek@gmail.com"]
-    elif pusher in devops_group:
-        recipients = ["chrispushkin@gmail.com", pushers_email]
-        # recipients = ["eigorek@gmail.com"]
-        #
+
+    if pusher in weight_team:
+        recipients.append(weight_team[weight_team_lead])
+        if pusher != weight_team_lead:
+            recipients.append(weight_team[pusher] if weight_team[pusher] else pushers_email)
+    elif pusher in providers_team:
+        recipients.append(providers_team[providers_team_lead])
+        if pusher != providers_team_lead:
+            recipients.append(providers_team[pusher] if providers_team[pusher] else pushers_email)
+    elif pusher in devops_team:
+        recipients.append(devops_team[devops_team_lead])  
+        if pusher != devops_team_lead:
+            recipients.append(devops_team[pusher] if devops_team[pusher] else pushers_email)      
 
     entry = "Tests and Commits Reports for {}'s Latest Push".format(data['pusher']['name'])
 
     send_email(entry, ["test_log.txt", "committers_log.txt"], recipients)    
-
+#
     return Response("200")
 
 if __name__ == '__main__':
