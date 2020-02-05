@@ -153,8 +153,9 @@ def get_item(id):
             return Response(status=400)
     else: # override the t2 time
         t2 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    if id.isdigit():
 
-    try:
         #if id is int dealing with containers
         id = int(id)
         ans = dbQuery("SELECT * FROM TruckContainers where id = {} ".format(id), False)
@@ -180,14 +181,9 @@ def get_item(id):
                     AND t2.id = {};'''.format(str(t1),str(t2),id), False)
         
         return {"id":str(id) , "tara":data[0][1] , "sessions":data[0][2]}
-        
+    else:
 
-
-
-        
-    except:
         #id is a string, dealing with trucks
-
         sessions_result_list = dbQuery('''SELECT t.TruckID, SUM(t2.WeightProduce), t.ID
         FROM
             weightDB.Transactions t
