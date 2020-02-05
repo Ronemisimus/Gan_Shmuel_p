@@ -110,7 +110,7 @@ def main():
     test_weight_route('/session/35' ,{"id": "35","truckID": "Truck1","items": [{"produce": "Oranges", "bruto" : "46", "neto": "null"},{"produce": "Apples", "bruto" : "76", "neto": "null"}]} )
 
     # testing item route
-    test_item_route('/item/truck1' ,{"id":"truck1","sessions":[35],"tara":92})
+    #test_item_route('/item/truck1' ,{"id":"truck1","sessions":[35],"tara":92})
     
     # #Testing Inserting Transaction with 3 containers using POST /weight
     # timeIn=datetime.now().strftime("%Y%m%d%H%M%S")
