@@ -5,10 +5,7 @@ from app.models import Truck, Provider, Rate
 from datetime import datetime, timezone
 import xlrd, os, sys
 
-last_opend_file=''
 allowed_ext = ['csv', 'xls', 'xlsx']
-data = []
-rates_data = []
 
 def create_provider(provider_name):
   provider = Provider(name=provider_name)
@@ -130,48 +127,40 @@ def getBill(id):
   provider_id=Provider.query.filter_by(id=id).first()
   if provider_id is None:
     return Response(json.dumps('Provider ({}) Not Found'.format(id)),mimetype='application/json')
-  provider_name=Provider.query.filter_by(id=id)
-  product_amount = {}
-  product_session_count = {}
-  products_list=[]
-  truck_count=0
-  session_count=0
-  from_date=request.args.get('from')
-  to_param=request.args.get('to')
-  to_date = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S') if to_param is None else to_param
-  trucks_of_provider=Truck.query.filter_by(provider_id=id).all()
-  if not trucks_of_provider:
-    return Response(json.dumps("Provider {} has no truck regiseted".format(provider_id)),mimetype='application/json')
   else:
+    provider_name=Provider.query.filter_by(id=id)
+    product_amount = {}
+    product_session_count = {}
+    products_list=[]
+    truck_count=0
+    session_count=0
+    from_date=request.args.get('from')
+    to_param=request.args.get('to')
+    to_date = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S') if to_param is None else to_param
+    trucks_of_provider=Truck.query.filter_by(provider_id=id).all()
+    print(type(trucks_of_provider))
     for truck in trucks_of_provider:
       truck_count+=1
-      try:
-        res=request.get('http://localhost:8086/truck/{}?from=20200101000000&to=20200201000000'.format(truck.id))
-      except:
-        return Response(status=404)
-      # { 
-      # "id": <str>,
-      # "tara": <int>, // last known tara in kg
-      # "sessions": [ <id1>,...] 
-      #     }
+      res=request.get('http://localhost:8086/truck/'+truck, data ={'from':from_date ,'to':to_date})
+    # { 
+    # "id": <str>,
+	  # "tara": <int>, // last known tara in kg
+	  # "sessions": [ <id1>,...] 
+    #     }
       for session in res['sessions']:
         session_count+=1
-        try:
-          res_session=request.get('http://18.194.232.207:8088/session/{}'.format(session))
-        except:
-          return Response(status=400)
-        print(res_session,file=sys.stderr)
-          # method get session id and return json in format:
-      # [{
-      # 	"id": "<id>",
-      # 	"truckID": "<truck id>",
-      # 	"items":
-      #  [{
-      # 		"produce": "<type of produce>",
-      # 		"bruto": "<weight bruto>",
-      # 		"neto": "<weight_neto| null>"
-      # 	}]
-      # }]
+        res_session=request.get('http://18.194.232.207:8088/session/'+session)
+        # method get session id and return json in format:
+    # [{
+    # 	"id": "<id>",
+    # 	"truckID": "<truck id>",
+    # 	"items":
+    #  [{
+    # 		"produce": "<type of produce>",
+    # 		"bruto": "<weight bruto>",
+    # 		"neto": "<weight_neto| null>"
+    # 	}]
+    # }]
         for product in res_session['items']:
           if product['produce'] in product_session_count:
             product_session_count[product['produce']]+=1
@@ -182,34 +171,33 @@ def getBill(id):
           else:
             product_amount[product['produce']]=product_amount[product['produce']]
 
-    #  {
-    #   "id": <str>,
-    #   "name": <str>,
-    #   "from": <str>,
-    #   "to": <str>,
-    #   "truckCount": <int>,
-    #   "sessionCount": <int>,
-    #   "products": [
-    #     { "product":<str>,
-    #       "count": <str>, // number of sessions
-    #       "amount": <int>, // total kg
-    #       "rate": <int>, // agorot
-    #       "pay": <int> // agorot
-    #     },...
-    #   ],
-    #   "total": <int> // agorot
-    # }
+  #  {
+	#   "id": <str>,
+	#   "name": <str>,
+	#   "from": <str>,
+	#   "to": <str>,
+	#   "truckCount": <int>,
+	#   "sessionCount": <int>,
+	#   "products": [
+	#     { "product":<str>,
+	#       "count": <str>, // number of sessions
+	#       "amount": <int>, // total kg
+	#       "rate": <int>, // agorot
+	#       "pay": <int> // agorot
+	#     },...
+	#   ],
+	#   "total": <int> // agorot
+	# }
     total_pay=0
     for key in product_session_count:
       if Rate.query.filter_by(product_id=key , scope=id) is None:
-        rate=json.loads(Rate.query.filter_by(product_id=key , scope=id).first())
+        rate=Rate.query.filter_by(product_id=key , scope=id)
       else:
-        rate=json.loads(Rate.query.filter_by(product_id=key , scope='ALL').first())
-      print(type(rate), file=sys.stderr)
-      product_details={'product':key ,'count':product_session_count[key],'amount':product_amount[key],'rate':rate.rate,'pay':(rate.rate*product_amount[key])}
+        rate=Rate.query.filter_by(product_id=key , scope='ALL').first()
+      product_details={'product':key ,'count':product_session_count[key],'amount':product_amount[key],'rate':rate,'pay':(rate*product_amount[key])}
       total_pay+=product_details['pay']
       products_list.append(product_details)
-  res_data = {'ID':id ,
+    res_data = {'ID':id ,
     'Name':provider_name,
     'From':from_date,
     'To':to_date,
@@ -217,16 +205,13 @@ def getBill(id):
     'Session_Count':session_count,
     'Products':products_list,
     'Total':total_pay}
-  return Response(res_data,mimetype='application/json')
+  return Response(json.dumps(res_data),mimetype='application/json')
 
 
 
 @app.route('/rates', methods=['GET' , 'POST'])
 def rates():
-  global last_opend_file
-  global allowed_ext
-  global data
-  global rates_data
+  global filename, full_path, allowed_ext
   if request.method=='POST':
     try:
       filename=request.form['file']
@@ -237,35 +222,33 @@ def rates():
       return "No file name was given. Please mention wanted file's name inside the form."
     finally:
       full_path=os.getcwd()+'/in/'+filename
-      last_opend_file = full_path  ## used inorder to restore the file in the GET method
     try:
       book = xlrd.open_workbook(full_path, on_demand=True)
     except:
-        return Response("File ({}) not found in folder".format(filename), status=404)
+      return Response("File ({}) not found in folder".format(filename), status=404)
     else: ## Case file was opend successfuly
       sheet = book.sheet_by_index(0) ## ToDo: change to find sheet by name
       for rownum in range(1,sheet.nrows):
-        for col in range(0, sheet.ncols):
-          col_name = sheet.col_values(col)[0].lower()
-          value = sheet.row_values(rownum)[col]  if col_name != 'product' else str(sheet.row_values(rownum)[col]).split('.')[0]
-        new_rate = Rate(product_id=temp_obj['product'], scope=temp_obj['scope'], rate=temp_obj['rate'])
-        exist_rate = Rate.query.filter_by(product_id=new_rate.product_id, scope=new_rate.scope).first()
-        if exist_rate is None:
+          for col in range(0, sheet.ncols):
+        col_name = sheet.col_values(col)[0].lower()
+        value = sheet.row_values(rownum)[col]  if col_name != 'product' else str(sheet.row_values(rownum)[col]).split('.')[0]
+      new_rate = Rate(product_id=temp_obj['product'], scope=temp_obj['scope'], rate=temp_obj['rate'])
+      exist_rate = Rate.query.filter_by(product_id=new_rate.product_id, scope=new_rate.scope).first()
+      if exist_rate is None:
         db.session.add(new_rate)
-        else:
-          exist_rate.rate = new_rate.rate
-        try:
-          db.session.commit()
-        except Exception as e:
-          msg = 'Could not insert new rate({})\n{}\n'.format(temp_obj, e)
-          return Response(msg, status=400)
-      book.release_resources()
-      del book
-      return Response('Done')
+      else:
+        exist_rate.rate = new_rate.rate
+      try:
+        db.session.commit()
+      except Exception as e:
+        msg = 'Could not insert new rate({})\n{}\n'.format(temp_obj, e)
+        return Response(msg, status=400)
+    book.release_resources()
+    del book
+    return Response('Done')
   elif request.method=='GET':
     try:
-      return send_file(last_opend_file[-1], mimetype='application/octet-stream',
-      attachment_filename=last_opend_file[-2]+'.xlsx',
-      as_attachment=True)
-    except FileNotFoundError:
-      return Response(status=404)   
+      return send_file(filename_or_fp=full_path,mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',cache_timeout=0,as_attachment=True)
+    except FileNotFoundError as e:
+      return Response(str(e), status=404)  
+        
