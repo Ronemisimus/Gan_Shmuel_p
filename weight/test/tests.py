@@ -83,6 +83,10 @@ def main():
     test__get_routes(url+"/weight?from=%s&to=%s&filter=out"%(str(timeIn),str(timeOut)),'{"bruto":"390","containers":"C1,C2","direction":"Out","neto":"210","produces":"Bananas,Peaches"}')
 
 
+    #testing batch-file route
+    test__post_routes(url+"/batch-weight?filename=containers3.json", "b'OK inserted to db'")
+    test__post_routes(url+"b'file not found or it already in database'", "b'OK inserted to db'")
+
     print(0)
 
 url = "http://localhost:{}".format(os.environ['PORT'])
