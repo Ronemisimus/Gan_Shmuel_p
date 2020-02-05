@@ -1,6 +1,6 @@
 from flask import Flask, request, Response, render_template, send_from_directory, redirect, url_for
 from datetime import datetime , time, timedelta
-from time import gmtime, strftime
+from time import strftime
 import mysql.connector
 from mysql.connector import Error
 from insertions import read_json_file , read_csv_file
@@ -139,11 +139,25 @@ def get_item(id):
     if not id:
         return Response(status=404) 
 
+    if request.args.get("from"):
+        try:
+            t1 = parse_time(request.args.get('from'))
+        except:
+            return Response(status=400)
+    else:
+        t1 = datetime.now().strftime("%Y-%m-01 00:00:00")
+    if request.args.get("to"):
+        try:
+            t2 = parse_time(request.args.get('to'))
+        except:
+            return Response(status=400)
+    else: # override the t2 time
+        t2 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     try:
         #if id is int dealing with containers
         id = int(id)
-        ans = dbQuery("SELECT * FROM TruckContainers where id = {} ".format(id), isInsertOrUpdate=False)
+        ans = dbQuery("SELECT * FROM TruckContainers where id = {} ".format(id), False)
        
         #if id is not exist
         if not len(ans):
@@ -159,11 +173,11 @@ def get_item(id):
                     INNER JOIN weightDB.Transactions t ON
                     t2.TransactionID = t.ID
                     WHERE
-                    t.TimeIn >= STR_TO_DATE('1997-12-01 12:00:00',
+                    t.TimeIn >= STR_TO_DATE('{}',
                     '%Y-%m-%d %T')
-                    AND t.TimeOut <= STR_TO_DATE('2021-12-01 12:00:00',
+                    AND t.TimeOut <= STR_TO_DATE('{}',
                     '%Y-%m-%d %T')
-                    AND t2.id = {};'''.format(id), isInsertOrUpdate=False)
+                    AND t2.id = {};'''.format(str(t1),str(t2),id), False)
         
         return {"id":str(id) , "tara":data[0][1] , "sessions":data[0][2]}
         
@@ -173,16 +187,6 @@ def get_item(id):
         
     except:
         #id is a string, dealing with trucks
-        t1 = request.args.get('from')
-        t1 = parse_time(t1)
-
-        t2 = request.args.get('to')
-        
-        # override the t2 time
-        if not t2:
-            t2 = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-        else:
-            t2 = datetime.strptime(t2 , '%Y%m%d%H%M%S')
 
         sessions_result_list = dbQuery('''SELECT t.TruckID, SUM(t2.WeightProduce), t.ID
         FROM
@@ -216,14 +220,14 @@ def weight():
 		except:
 			return Response(status=400)
 	else:
-		start = ((datetime.utcnow() + timedelta(hours=2)).strftime("%Y-%m-%d 00:00:00"))
+		start = datetime.now().strftime("%Y-%m-%d 00:00:00")
 	if request.args.get("to"):
 		try:
 			end = parse_time(request.args.get('to'))
 		except:
 			return Response(status=400)
 	else:
-		end = ((datetime.utcnow() + timedelta(hours=2)).strftime("%Y-%m-%d %H:%M:%S"))
+		end = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 	if request.args.get("filter"):
 		filt=("("+request.args.get("filter")+")").replace("(","('").replace(",","','").replace(")","')")
 	else:
@@ -253,7 +257,7 @@ def weight():
 
 @app.route("/weight", methods=['POST'])
 def weightpost():
-	currtime = ((datetime.utcnow() + timedelta(hours=2)).strftime("%Y-%m-%d %H:%M:%S"))
+	currtime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 	direction = request.args.get('direction')
 	truckID = request.args.get('truck')
 	containers = request.args.get('containers').split("+") #type:produce+type:produce
