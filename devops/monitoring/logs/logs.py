@@ -24,7 +24,7 @@ weight_team_lead = "nati-elmaliach"
 
 providers_team = {
     "M-Wittner" : "",
-    "RonBenMoshe" : "",
+    "RonBenMoshe" : "RonBenMoshe@gmail.com",
     "Neta182" : ""
 }
 
@@ -86,20 +86,6 @@ def tests_report(data):
 
     log_entry("\n" + entry + "\n\n" + messages, "test_log.txt")
 
-def gitOrGmail(team, name, email):
-    if mail.find(gmail):
-        return mail
-    else:
-        return team[name]
-
-def emailRecipient(recipients, pusher, pushers_email, team):
-    team_lead = "{}_lead".format(team)
-    recipients.append(gitOrGmail(team, team_lead, team[team_lead]))
-
-    if pusher != team_lead:
-        recipients.append(gitOrGmail(team, pusher, pushers_email))
-
-
 @app.route('/log', methods=['POST'])
 def log():
     data = request.get_json()
@@ -111,11 +97,17 @@ def log():
     recipients = []
 
     if pusher in weight_team:
-        recipients = emailRecipient(recipients, pusher, pushers_email, weight_team)
+        recipients.append(weight_team[weight_team_lead])
+        if pusher != weight_team_lead:
+            recipients.append(weight_team[pusher] if weight_team[pusher] else pushers_email)
     elif pusher in providers_team:
-        recipients = emailRecipient(recipients, pusher, pushers_email, providers_team)
+        recipients.append(providers_team[providers_team_lead])
+        if pusher != providers_team_lead:
+            recipients.append(providers_team[pusher] if providers_team[pusher] else pushers_email)
     elif pusher in devops_team:
-        recipients = emailRecipient(recipients, pusher, pushers_email, devops_team)
+        recipients.append(devops_team[devops_team_lead])  
+        if pusher != devops_team_lead:
+            recipients.append(devops_team[pusher] if devops_team[pusher] else pushers_email)      
 
     entry = "Tests and Commits Reports for {}'s Latest Push".format(data['pusher']['name'])
 
