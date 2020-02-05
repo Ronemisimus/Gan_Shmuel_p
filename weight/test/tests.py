@@ -1,4 +1,4 @@
-import requests
+import requests , json
 import os
 from datetime import datetime
 
@@ -51,10 +51,22 @@ def test_health():
     except Exception as e :
         status = 1
 
-
+def test_weight_route( path, expected):
+    global url
+    global status
+    try:
+        res = requests.get(url + path)
+        res = json.dumps(res.json())
+    except Exception as e:
+        status = 1
+    else:
+        expected_res = json.dumps(expected)
+        status = not (expected_res == res)
+    
 def main():
     
     #testing session  route
+    test_weight_route('/session/35' ,{"id": "35","truckID": "Truck1","items": [{"produce": "Oranges", "bruto" : "46", "neto": "null"},{"produce": "Apples", "bruto" : "76", "neto": "null"}]} )
     # test__get_routes(url+"/session/35" ,'{"id": "35","truckID": "Truck1","items": [{"produce": "Oranges", "bruto" : "46", "neto": "null"},{"produce": "Apples", "bruto" : "76", "neto": "null"}]}')
     # test__get_routes(url+"/session/36" ,"""{"id": "36","truckID": "Truck1","items": [{"produce": "Tomato", "bruto" : "24", "neto": "null"},{"produce": "Test", "bruto" : "None", "neto": "null"}]}""")
     # test__get_routes(url+"/session/", "")
