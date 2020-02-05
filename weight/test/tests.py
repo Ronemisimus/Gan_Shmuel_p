@@ -29,7 +29,6 @@ def test__get_routes(route, expected):
     log , code  = validate(int(res.status_code), str(res.content), expected)
     if code == 1:
         print(log)
-        exit()
 
 
 # Test Post request
@@ -38,7 +37,6 @@ def test__post_routes(route, expected):
     log , code  = validate(int(res.status_code), str(res.content), expected)
     if code == 1:
         print(log)
-        exit()
 
 
 
