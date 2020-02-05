@@ -40,7 +40,7 @@ def provider():
   provider_name=request.form['provider']
   provider_res=create_provider(provider_name)
   if provider_res is None:
-    return Response(json.dumps("Provider {} is already exists!".format(provider_name)),mimetype='application/json')
+    return Response(json.dumps("Provider {} is already exists!".format(provider_name)),mimetype='application/json',status=400)
   
   res={'ID':provider_res.id}
   return Response(json.dumps(res),mimetype='application/json')
@@ -51,12 +51,12 @@ def updateProvider(provider_id):
   if Provider.query.filter_by(name=provider_new_name).first() is None: 
     search_provider_id=Provider.query.filter_by(id=provider_id).first()
     if search_provider_id is None:
-      return Response("Provider {} is not exist! ".format(provider_id),mimetype='text/plain', status=404)
+      return Response("Provider {} is not exist! ".format(provider_id),mimetype='text/plain', status=400)
     search_provider_id.name=provider_new_name
     db.session.commit()
     return Response(json.dumps("Provider {} new name is {}".format(search_provider_id.id,search_provider_id.name)),mimetype='application/json')
   else:
-    return Response(json.dumps("Provider name {} already exist ,cant accpet new name!".format(provider_new_name)),mimetype='application/json')
+    return Response(json.dumps("Provider name {} already exist ,cant accpet new name!".format(provider_new_name)),mimetype='application/json',status=400)
   
     
 @app.route('/truck', methods=['POST'])
