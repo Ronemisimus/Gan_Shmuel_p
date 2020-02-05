@@ -24,7 +24,7 @@ weight_team_lead = "nati-elmaliach"
 
 providers_team = {
     "M-Wittner" : "Matan.wittner@gmail.com",
-    "RonBenMoshe" : "RonBenMoshe@gmail.com",
+    "RonBenMoshe" : "ronmoshe333@gmail.com",
     "Neta182" : "Netaba@mta.ac.il"
 }
 
@@ -71,14 +71,9 @@ def commits_report(data):
 def tests_report(data):
     messages = ""
 
-    # data["tests"] = { 
-    #     "app_name" : "weight",
-    #     "test_result" : "failure"
-    # }
-
     messages += "Tests for {}: {}".format(data["tests"]["app_name"], data["tests"]["test_result"])
 
-    entry = "Dummy Test Report for {}'s Latest Push".format(data['pusher']['name'])
+    entry = "Test Report for {}'s Latest Push".format(data['pusher']['name'])
 
     log_entry("\n" + entry + "\n\n" + messages, "test_log.txt")
 
