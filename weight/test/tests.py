@@ -60,8 +60,7 @@ def main():
     test__get_routes(url+"/item/c1","""{}""")
     test__get_routes(url+"/item/Truck1?from=20200202112732&to=20211231011500","""id":"Truck1","sessions":[35],"tara":92""")
 
-    test_rout_weight(url+"/weight",{})
-
+    #test_rout_weight(url+"/weight",{})
     #Testing Inserting Transaction with 3 containers using POST /weight
     # timeIn=datetime.now().strftime("%Y%m%d%H%M%S")
     # test__post_routes(url+"/weight?direction=in&truck=DebugTruck&containers=C1%3APeaches%2BC1%3APeaches%2BC2%3ABananas&weight=390","")
