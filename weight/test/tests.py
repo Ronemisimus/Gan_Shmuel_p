@@ -106,10 +106,11 @@ def test_get_routes(path , expected):
     expected_res = ''
 
     try:
-        res = requests.get(url + path)
+        res = requests.get(url + path, timeout=5)
         res = json.dumps(res.json())
         expected_res = json.dumps(expected)
     except Exception as e:
+        print(e)
         status = 1
 
     if res != expected_res:
@@ -121,7 +122,7 @@ def test_get_routes(path , expected):
 test = False
 def main():
     test_health()
-    
+
     test_get_routes('/unknown' ,{"7":{"ContainerID":"C1","Produce":"Test","TransactionID":"36"}})
     test_get_routes('/item/Truck1?from=20200202112732&to=20211231011500' ,{"id":"Truck1","sessions":[35],"tara":92})
     test_get_routes('/session/35' , {"id": "35","truckID": "Truck1","items": [{"produce": "Oranges", "bruto" : "46", "neto": "null"},{"produce": "Apples", "bruto" : "76", "neto": "null"}]})
