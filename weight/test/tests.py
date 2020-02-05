@@ -62,7 +62,7 @@ def main():
 
     test_rout_weight(url+"/weight",{})
 
-    Testing Inserting Transaction with 3 containers using POST /weight
+    #Testing Inserting Transaction with 3 containers using POST /weight
     timeIn=datetime.now().strftime("%Y%m%d%H%M%S")
     test__post_routes(url+"/weight?direction=in&truck=DebugTruck&containers=C1%3APeaches%2BC1%3APeaches%2BC2%3ABananas&weight=390","")
     test__post_routes(url+"/weight?direction=none&truck=DebugTruck&containers=C1%3APeaches%2BC2%3ABananas&weight=308","")
@@ -70,7 +70,7 @@ def main():
     test__post_routes(url+"/weight?direction=out&truck=DebugTruck&containers=&weight=150","")
     timeOut=datetime.now().strftime("%Y%m%d%H%M%S")
 
-    Testing if Transaction was entered successfully
+    # Testing if Transaction was entered successfully
     test__get_routes(url+"/weight?from=%s&to=%s&filter=out"%(str(timeIn),str(timeOut)),'{"bruto":"390","containers":"C1,C2","direction":"Out","neto":"210","produces":"Bananas,Peaches"}')
 
 
