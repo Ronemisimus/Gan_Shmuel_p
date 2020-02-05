@@ -60,12 +60,12 @@ def main():
     # test_rout_weight(url+"/weight",{})
 
     # Testing Inserting Transaction with 3 containers using POST /weight
-    timeIn=datetime.now().strftime("%Y%m%d%H%M%S")
-    test__post_routes(url+"/weight?direction=in&truck=DebugTruck&containers=C1%3APeaches%2BC1%3APeaches%2BC2%3ABananas&weight=390","")
-    test__post_routes(url+"/weight?direction=none&truck=DebugTruck&containers=C1%3APeaches%2BC2%3ABananas&weight=308","")
-    test__post_routes(url+"/weight?direction=none&truck=DebugTruck&containers=C2%3ABananas&weight=236","")
-    test__post_routes(url+"/weight?direction=out&truck=DebugTruck&containers=&weight=150","")
-    timeOut=datetime.now().strftime("%Y%m%d%H%M%S")
+    # timeIn=datetime.now().strftime("%Y%m%d%H%M%S")
+    # test__post_routes(url+"/weight?direction=in&truck=DebugTruck&containers=C1%3APeaches%2BC1%3APeaches%2BC2%3ABananas&weight=390","")
+    # test__post_routes(url+"/weight?direction=none&truck=DebugTruck&containers=C1%3APeaches%2BC2%3ABananas&weight=308","")
+    # test__post_routes(url+"/weight?direction=none&truck=DebugTruck&containers=C2%3ABananas&weight=236","")
+    # test__post_routes(url+"/weight?direction=out&truck=DebugTruck&containers=&weight=150","")
+    # timeOut=datetime.now().strftime("%Y%m%d%H%M%S")
 
      # testing item route
     test__get_routes(url+"/item/truck1", """id":"truck1","sessions":[35],"tara":92""")
