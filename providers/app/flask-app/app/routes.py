@@ -1,5 +1,5 @@
 import requests, json
-from flask import request, jsonify, Response, json, redirect, url_for, send_file
+from flask import request, jsonify, Response, json, redirect, url_for, send_file, render_template
 from app import app, db
 from app.models import Truck, Provider, Rate
 from datetime import datetime, timezone
@@ -33,7 +33,7 @@ def health():
   return test_health()
 @app.route('/')
 def home():
-    return 'Home page'
+    return render_template('index.html')
 
 @app.route('/provider',methods =['POST'])
 def provider():
@@ -42,7 +42,7 @@ def provider():
   if provider_res is None:
     return Response(json.dumps("Provider {} is already exists!".format(provider_name)),mimetype='application/json')
   
-  res={'ID':provider_res.id}
+  res={'id':provider_res.id, 'name':provider_res.name}
   return Response(json.dumps(res),mimetype='application/json')
 
 @app.route('/provider/<provider_id>' , methods=['PUT'])
@@ -54,7 +54,8 @@ def updateProvider(provider_id):
       return Response("Provider {} is not exist! ".format(provider_id),mimetype='text/plain', status=404)
     search_provider_id.name=provider_new_name
     db.session.commit()
-    return Response(json.dumps("Provider {} new name is {}".format(search_provider_id.id,search_provider_id.name)),mimetype='application/json')
+    res = {'id': search_provider_id.id, 'name': provider_new_name}
+    return Response(json.dumps(res),mimetype='application/json')
   else:
     return Response(json.dumps("Provider name {} already exist ,cant accpet new name!".format(provider_new_name)),mimetype='application/json')
   
@@ -215,6 +216,7 @@ def rates():
   global filename, volume_path, allowed_ext, full_path
   full_path = ''
   if request.method=='POST':
+    rate_list = []
     try:
       filename=request.form['file']
       file_ext = filename.split('.')[-1]
@@ -232,6 +234,7 @@ def rates():
       sheet = book.sheet_by_index(0) ## ToDo: change to find sheet by name
       for rownum in range(1,sheet.nrows):
         temp_obj={}
+        temp_rate={}
         for col in range(0, sheet.ncols):
           col_name = sheet.col_values(col)[0].lower()
           value = sheet.row_values(rownum)[col]  if col_name != 'product' else str(sheet.row_values(rownum)[col]).split('.')[0]
@@ -240,16 +243,20 @@ def rates():
         exist_rate = Rate.query.filter_by(product_id=new_rate.product_id, scope=new_rate.scope).first()
         if exist_rate is None:
           db.session.add(new_rate)
+          temp_rate=new_rate.serialize
         else:
-          exist_rate.rateGET = new_rate.rate
+          exist_rate.rate = new_rate.rate
+          temp_rate=exist_rate.serialize
         try:
           db.session.commit()
         except Exception as e:
           msg = 'Could not insert new rate({})\n{}\n'.format(temp_obj, e)
           return Response(msg, status=400)
+        else:
+          rate_list.append(temp_rate)
     book.release_resources()
     del book
-    return Response('Done')
+    return Response(json.dumps(rate_list), status=200)
   elif request.method=='GET':
     if full_path is None or full_path == '':
       return Response('There are no available files', status=404)
