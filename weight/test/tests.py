@@ -4,40 +4,46 @@ from datetime import datetime
 
 
 
-# This is the repo
-def validate(status, content, expected):
-    print(content)
-    print(expected)
-    code = 0
-    log_info = ""
-    if 500 <= status <= 599 :
-        log_info = "Status:  {}\n Content:\n{} \n Fail.\n".format(status, content)
-        code = 1 
-    else:
-        if expected in content:
-            log_info = "Status:  {}\n Content:\n{} \n \n".format(status, content)
-        else:
-            log_info = "Status:  {}\n Invalid Content:\n{}\n Expected: \n{} \n respone not as expected.\n".format(status, content, expected)
-            code = 1
-    return log_info , code
+# # This is the repo
+# def validate(status, content, expected):
+#     print(content)
+#     print(expected)
+#     code = 0
+#     log_info = ""
+#     if 500 <= status <= 599 :
+#         log_info = "Status:  {}\n Content:\n{} \n Fail.\n".format(status, content)
+#         code = 1 
+#     else:
+#         if expected in content:
+#             log_info = "Status:  {}\n Content:\n{} \n \n".format(status, content)
+#         else:
+#             log_info = "Status:  {}\n Invalid Content:\n{}\n Expected: \n{} \n respone not as expected.\n".format(status, content, expected)
+#             code = 1
+#     return log_info , code
 
 
 
-# Test Get request
-def test__get_routes(route, expected):
-    res = requests.get(route)
-    log , code  = validate(int(res.status_code), str(res.content), expected)
-    if code == 1:
-        print(log)
+# # Test Get request
+# def test__get_routes(route, expected):
+#     res = requests.get(route)
+#     log , code  = validate(int(res.status_code), str(res.content), expected)
+#     if code == 1:
+#         print(log)
 
 
-# Test Post request
-def test__post_routes(route, expected):
-    res = requests.post(route)
-    log , code  = validate(int(res.status_code), str(res.content), expected)
-    if code == 1:
-        print(log)
+# # Test Post request
+# def test__post_routes(route, expected):
+#     res = requests.post(route)
+#     log , code  = validate(int(res.status_code), str(res.content), expected)
+#     if code == 1:
+#         print(log)
 
+global status = 0
+def test_health():
+    try:
+        requests.get(url + '/health')
+    except Exception as e :
+        status = 1
 
 
 def main():
@@ -76,13 +82,13 @@ def main():
     # test__post_routes(url+"/batch-weight?filename=containers3.json'", "database")
 
     # #testing /health route
-    test__get_routes(url+"/health", "OK")
+    #test__get_routes(url+"/health", "OK")
+    test_health()
+    print(status)
 
     # #testing /unknown route
     #test__get_routes(url+"/unknown", "b'7  '")
 
-    print(0)
-
-url = "http://localhost:{}".format(os.environ['PORT'])
+global url = "http://localhost:{}".format(os.environ['PORT'])
 
 main()
