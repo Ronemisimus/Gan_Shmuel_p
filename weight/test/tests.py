@@ -48,11 +48,7 @@ def main():
     test__get_routes(url+"/weight?from=10000303000000&to=30000303000000",'"35":{"bruto":"178","containers":"C1,C2","direction":"in","neto":"92","produces":"Apples,Oranges"},"36":{"bruto":"125","containers":"C1","direction":"In","neto":"12","produces":"Test,Tomato"}')
     test__get_routes(url+"/weight?", "{")
 
-    # #testing /health route
-    test__get_routes(url+"/health", "b'OK'")
 
-    # #testing /unknown route
-    test__get_routes(url+"/unknown", "b'7  '")
 
     #testing session  route
     test__get_routes(url+"/session/35" ,'{"id": "35","truckID": "Truck1","items": [{"produce": "Oranges", "bruto" : "46", "neto": "null"},{"produce": "Apples", "bruto" : "76", "neto": "null"}]}')
@@ -64,24 +60,30 @@ def main():
     test__get_routes(url+"/item/c1","""{}""")
     test__get_routes(url+"/item/Truck1?from=20200202112732&to=20211231011500","""id":"Truck1","sessions":[35],"tara":92""")
 
-    # # test_rout_weight(url+"/weight",{})
+    test_rout_weight(url+"/weight",{})
 
-    # # Testing Inserting Transaction with 3 containers using POST /weight
-    # # timeIn=datetime.now().strftime("%Y%m%d%H%M%S")
-    # # test__post_routes(url+"/weight?direction=in&truck=DebugTruck&containers=C1%3APeaches%2BC1%3APeaches%2BC2%3ABananas&weight=390","")
-    # # test__post_routes(url+"/weight?direction=none&truck=DebugTruck&containers=C1%3APeaches%2BC2%3ABananas&weight=308","")
-    # # test__post_routes(url+"/weight?direction=none&truck=DebugTruck&containers=C2%3ABananas&weight=236","")
-    # # test__post_routes(url+"/weight?direction=out&truck=DebugTruck&containers=&weight=150","")
-    # # timeOut=datetime.now().strftime("%Y%m%d%H%M%S")
+    Testing Inserting Transaction with 3 containers using POST /weight
+    timeIn=datetime.now().strftime("%Y%m%d%H%M%S")
+    test__post_routes(url+"/weight?direction=in&truck=DebugTruck&containers=C1%3APeaches%2BC1%3APeaches%2BC2%3ABananas&weight=390","")
+    test__post_routes(url+"/weight?direction=none&truck=DebugTruck&containers=C1%3APeaches%2BC2%3ABananas&weight=308","")
+    test__post_routes(url+"/weight?direction=none&truck=DebugTruck&containers=C2%3ABananas&weight=236","")
+    test__post_routes(url+"/weight?direction=out&truck=DebugTruck&containers=&weight=150","")
+    timeOut=datetime.now().strftime("%Y%m%d%H%M%S")
 
-    # # Testing if Transaction was entered successfully
-    # #test__get_routes(url+"/weight?from=%s&to=%s&filter=out"%(str(timeIn),str(timeOut)),'{"bruto":"390","containers":"C1,C2","direction":"Out","neto":"210","produces":"Bananas,Peaches"}')
+    Testing if Transaction was entered successfully
+    test__get_routes(url+"/weight?from=%s&to=%s&filter=out"%(str(timeIn),str(timeOut)),'{"bruto":"390","containers":"C1,C2","direction":"Out","neto":"210","produces":"Bananas,Peaches"}')
 
 
 
     #testing batch-file route
     # test__post_routes(url+"/batch-weight?filename=containers3.json", "OK")
     # test__post_routes(url+"/batch-weight?filename=containers3.json'", "database")
+
+    # #testing /health route
+    #test__get_routes(url+"/health", "b'OK'")
+
+    # #testing /unknown route
+    #test__get_routes(url+"/unknown", "b'7  '")
 
     print(0)
 
