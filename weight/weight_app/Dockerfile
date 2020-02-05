@@ -3,9 +3,9 @@ RUN mkdir app
 COPY requirements.txt /app
 WORKDIR /app
 RUN pip3 install -r requirements.txt
-COPY . /app
 RUN apk add --no-cache tzdata
 ENV TZ Asia/Jerusalem
+COPY . /app
 
 ENTRYPOINT flask run --host=0.0.0.0
 

@@ -21,6 +21,9 @@ def validate(status, content, expected):
 
 
 
+
+
+
 def test__get_routes(route, expected):
     res = requests.get(route)
     log , code  = validate(int(res.status_code), str(res.content), expected)
@@ -38,8 +41,10 @@ def test__post_routes():
 
 
 def main():
-    # test__get_routes(url+"/weight?from=10000303000000&to=30000303000000&f=in",'{')
-    #test__get_routes(url+"/weight?from=10000303000000&to=30000303000000",'{"35":{"bruto":"178","containers":"C1,C2","direction":"in","neto":"92","produces":"Apples,Oranges"},"36":{"bruto":"125","containers":"C1","direction":"In","neto":"12","produces":"Test,Tomato"}}')
+    # testing weight route
+    test__get_routes(url+"/weight?from=10000303000000&to=30000303000000&f=in",'{"35":{"bruto":"178","containers":"C1,C2","direction":"in","neto":"92","produces":"Apples,Oranges"},"36":{"bruto":"125","containers":"C1","direction":"In","neto":"12","produces":"Test,Tomato"}}')
+    test__get_routes(url+"/weight?from=10000303000000&to=30000303000000",     '{"35":{"bruto":"178","containers":"C1,C2","direction":"in","neto":"92","produces":"Apples,Oranges"},"36":{"bruto":"125","containers":"C1","direction":"In","neto":"12","produces":"Test,Tomato"}}')
+    test__get_routes(url+"/weight?", "{}")
     #testing /health route
     test__get_routes(url+"/health", "b'OK'")
     #testing /unknown route
