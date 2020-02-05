@@ -40,7 +40,7 @@ def monitor():
             else:
                 printM += (htmlS+' returned:'+response.status_code+'<br>')
         except:
-            printM += ('<span style="color:#8B0000"><b>'+htmlS+' is unreachable</span><br>')
+            printM += ('<span style="color:#8B0000"><b>'+htmlS+' is unreachable</b></span><br>')
 
     while True:
         for service in services:
