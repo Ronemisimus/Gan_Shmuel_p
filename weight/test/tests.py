@@ -54,15 +54,18 @@ def test_health():
 def test_weight_route( path, expected):
     global url
     global status
+    res =''
+    expected_res = ''
     try:
         res = requests.get(url + path)
         res = json.dumps(res.json())
         expected_res = json.dumps(expected)
-        print(type(expected_res))
-        print(type(res))
     except Exception as e:
-        print("inside exception")
         status = 1
+    
+    if res != expected_res:
+        status = 1
+
     
 def main():
     
