@@ -112,16 +112,16 @@ def main():
     # testing item route
     test_item_route('/item/truck1' ,{"id":"truck1","sessions":[35],"tara":92})
     
-    #Testing Inserting Transaction with 3 containers using POST /weight
-    timeIn=datetime.now().strftime("%Y%m%d%H%M%S")
-    test_weightPost_route("/weight?direction=in&truck=DebugTruck&containers=C1%3APeaches%2BC1%3APeaches%2BC2%3ABananas&weight=390","<Response [200]>")
-    test_weightPost_route("/weight?direction=none&truck=DebugTruck&containers=C1%3APeaches%2BC2%3ABananas&weight=308","<Response [200]>")
-    test_weightPost_route("/weight?direction=none&truck=DebugTruck&containers=C2%3ABananas&weight=236","<Response [200]>")
-    test_weightPost_route("/weight?direction=out&truck=DebugTruck&containers=&weight=150","<Response [200]>")
-    timeOut=datetime.now().strftime("%Y%m%d%H%M%S")
+    # #Testing Inserting Transaction with 3 containers using POST /weight
+    # timeIn=datetime.now().strftime("%Y%m%d%H%M%S")
+    # test_weightPost_route("/weight?direction=in&truck=DebugTruck&containers=C1%3APeaches%2BC1%3APeaches%2BC2%3ABananas&weight=390","<Response [200]>")
+    # test_weightPost_route("/weight?direction=none&truck=DebugTruck&containers=C1%3APeaches%2BC2%3ABananas&weight=308","<Response [200]>")
+    # test_weightPost_route("/weight?direction=none&truck=DebugTruck&containers=C2%3ABananas&weight=236","<Response [200]>")
+    # test_weightPost_route("/weight?direction=out&truck=DebugTruck&containers=&weight=150","<Response [200]>")
+    # timeOut=datetime.now().strftime("%Y%m%d%H%M%S")
 
-    # # Testing if Transaction was entered successfully
-    test_weightafterPost_route("/weight?from=%s&to=%s&filter=out"%(str(timeIn),str(timeOut)),'{"bruto":"390","containers":"C1,C2","direction":"Out","neto":"210","produces":"Bananas,Peaches"}')
+    # # # Testing if Transaction was entered successfully
+    # test_weightafterPost_route("/weight?from=%s&to=%s&filter=out"%(str(timeIn),str(timeOut)),'{"bruto":"390","containers":"C1,C2","direction":"Out","neto":"210","produces":"Bananas,Peaches"}')
 
 
     # #testing /health route
@@ -129,7 +129,7 @@ def main():
     test_batch_weight("/batch-weight", "file not found or it already in database")
 
     # testing /unknown route
-    #test_unknown("/unknown",{"7":{"ContainerID":"C1","Produce":"Test","TransactionID":"36"},"8":{"ContainerID":"C1","Produce":"Bananas","TransactionID":"37"},"9":{"ContainerID":"C2","Produce":"Peaches","TransactionID":"37"}})
+    test_unknown("/unknown",{"7":{"ContainerID":"C1","Produce":"Test","TransactionID":"36"},"8":{"ContainerID":"C1","Produce":"Bananas","TransactionID":"37"},"9":{"ContainerID":"C2","Produce":"Peaches","TransactionID":"37"}})
     print(status)
 
 main()
