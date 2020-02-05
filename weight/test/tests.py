@@ -43,13 +43,7 @@ def test__post_routes(route, expected):
 
 
 def main():
-    # testing get weight route
-    test__get_routes(url+"/weight?from=10000303000000&to=30000303000000&filter=in",'"35":{"bruto":"178","containers":"C1,C2","direction":"in","neto":"92","produces":"Apples,Oranges"},"36":{"bruto":"125","containers":"C1","direction":"In","neto":"12","produces":"Test,Tomato"}')
-    test__get_routes(url+"/weight?from=10000303000000&to=30000303000000",'"35":{"bruto":"178","containers":"C1,C2","direction":"in","neto":"92","produces":"Apples,Oranges"},"36":{"bruto":"125","containers":"C1","direction":"In","neto":"12","produces":"Test,Tomato"}')
-    test__get_routes(url+"/weight?", "{")
-
-
-
+    
     #testing session  route
     test__get_routes(url+"/session/35" ,'{"id": "35","truckID": "Truck1","items": [{"produce": "Oranges", "bruto" : "46", "neto": "null"},{"produce": "Apples", "bruto" : "76", "neto": "null"}]}')
     test__get_routes(url+"/session/36" ,"""{"id": "36","truckID": "Truck1","items": [{"produce": "Tomato", "bruto" : "24", "neto": "null"},{"produce": "Test", "bruto" : "None", "neto": "null"}]}""")
@@ -59,6 +53,11 @@ def main():
     test__get_routes(url+"/item/truck1", """id":"truck1","sessions":[35],"tara":92""")
     test__get_routes(url+"/item/c1","""{}""")
     test__get_routes(url+"/item/Truck1?from=20200202112732&to=20211231011500","""id":"Truck1","sessions":[35],"tara":92""")
+
+    # # testing get weight route
+    # test__get_routes(url+"/weight?from=10000303000000&to=30000303000000&filter=in",'"35":{"bruto":"178","containers":"C1,C2","direction":"in","neto":"92","produces":"Apples,Oranges"},"36":{"bruto":"125","containers":"C1","direction":"In","neto":"12","produces":"Test,Tomato"}')
+    # test__get_routes(url+"/weight?from=10000303000000&to=30000303000000",'"35":{"bruto":"178","containers":"C1,C2","direction":"in","neto":"92","produces":"Apples,Oranges"},"36":{"bruto":"125","containers":"C1","direction":"In","neto":"12","produces":"Test,Tomato"}')
+    # test__get_routes(url+"/weight?", "{")
 
     #test_rout_weight(url+"/weight",{})
     #Testing Inserting Transaction with 3 containers using POST /weight
@@ -87,6 +86,5 @@ def main():
     print(0)
 
 url = "http://localhost:{}".format(os.environ['PORT'])
-
 
 main()
