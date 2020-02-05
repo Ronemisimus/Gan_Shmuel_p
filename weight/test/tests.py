@@ -9,13 +9,7 @@ url = "http://localhost:{}".format(os.environ['PORT'])
 
 
 
-def test_health():
-    global url
-    global status
-    try:
-        requests.get(url + '/health')
-    except Exception as e :
-        status = 1
+
 
 def test_weight_route( path, expected):
     global url
@@ -91,6 +85,13 @@ def test_batch_weight(path, expected):
     if res != expected_res:
         status = 1
 
+def test_health():
+    global url
+    global status
+    try:
+        requests.get(url + '/health')
+    except Exception as e :
+        status = 1
 
 def test_get_routes(path , expected):
      
@@ -121,7 +122,7 @@ test = False
 def main():
     test_health()
 
-    #test_get_routes('/unknown' ,{"7":{"ContainerID":"C1","Produce":"Test","TransactionID":"36"}})
+    test_get_routes('/unknown' ,{"7":{"ContainerID":"C1","Produce":"Test","TransactionID":"36"}})
     #test_get_routes('/item/Truck1?from=20200202112732&to=20211231011500' ,{"id":"Truck1","sessions":[35],"tara":92})
     test_get_routes('/session/35' , {"id": "35","truckID": "Truck1","items": [{"produce": "Oranges", "bruto" : "46", "neto": "null"},{"produce": "Apples", "bruto" : "76", "neto": "null"}]})
     print(status)
