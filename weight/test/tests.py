@@ -126,10 +126,10 @@ def main():
 
     # #testing /health route
     test_health()
-    #test_batch_weight("/batch-weight", "file not found or it already in database")
+    test_batch_weight("/batch-weight", "file not found or it already in database")
 
     # testing /unknown route
-    test_unknown("/unknown",{"7":{"ContainerID":"C1","Produce":"Test","TransactionID":"36"},"8":{"ContainerID":"C1","Produce":"Bananas","TransactionID":"37"},"9":{"ContainerID":"C2","Produce":"Peaches","TransactionID":"37"}})
+    #test_unknown("/unknown",{"7":{"ContainerID":"C1","Produce":"Test","TransactionID":"36"},"8":{"ContainerID":"C1","Produce":"Bananas","TransactionID":"37"},"9":{"ContainerID":"C2","Produce":"Peaches","TransactionID":"37"}})
     print(status)
 
 main()
