@@ -8,6 +8,7 @@ import xlrd, os, sys
 allowed_ext = ['csv', 'xls', 'xlsx']
 base_url = 'http://18.194.232.207:8089/'
 volume_path=os.getcwd()+'/in/'
+full_path=''
 
 def create_provider(provider_name):
   provider = Provider(name=provider_name)
@@ -213,7 +214,6 @@ def getBill(id):
 @app.route('/rates', methods=['GET' , 'POST'])
 def rates():
   global filename, volume_path, allowed_ext, full_path
-  full_path = ''
   if request.method=='POST':
     try:
       filename=request.form['file']
