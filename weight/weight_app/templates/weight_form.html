@@ -13,36 +13,40 @@
           $("#sendBtn").click(sendpost)
         });
     </script>
-    <body>
-        <center>
-            <div style="width: 50%; margin-top:10%; text-align: left; position: relative">
-                <form id="inform" method = 'POST' action = '/weight'>
-                    <p>
-                        Direction:</br>
-                        <input type="radio" name="direction" value="in" required> in 
-                        <input type="radio" name="direction" value="none" required> none 
-                        <input type="radio" name="direction" value="out" required> out
-                    </p>
-                    <p>
-                        Truck:</br>
-                        <input type = 'text' placeholder = 'truck' required name = 'truck'>
-                    </p>
-                    <p>
-                        Containers:</br>
-                        <input type = 'text' placeholder = 'type:produce+type:produce' name = 'containers'>
-                    </p>
-                    <p>
-                        Weight:</br>
-                        <input type = 'number' placeholder='kg' required name = 'weight'>
-                    <p>
-                    <p>
-                        <input type="checkbox" name="Force" >
-                        force
-                    </p>
-                    <input id="sendBtn" type = 'button' value="Submit">
-                </form>
-                <img src="/static/gan-shmuel.png" style="position: fixed; bottom:0px; right:0px; position: fixed;">
+    <body style='background-image: url("/static/backgroundB.jpg"); background-size:cover'>
+            <div style="width: 50%; margin:0 auto; margin-top:12%; text-align: left; position: relative; background-color:RGBA(255,255,255,0.8); border-radius:8px; padding:30px">
+                <div style='width: 50%; float:right'>
+                    <h2 style="font-size:30px">Gan Shmuel Weight Input</h2>
+                    <img src="/static/gan-shmuel.png" style="right:15px; bottom:0; position:absolute;width: 40%;">
+                </div>
+                <div style='width: 50%'>
+                    <form id="inform" method = 'POST' action = '/weight'>
+                        <p>
+                            <h3 style="margin:5px 5px 5px 0px">Direction:</h3>
+                            <input type="radio" name="direction" value="in" required> in 
+                            <input type="radio" name="direction" value="none" required> none 
+                            <input type="radio" name="direction" value="out" required> out
+                        </p>
+                        <p>
+                            <h3 style="margin:5px 5px 5px 0px">Truck:</h3>
+                            <input type = 'text' placeholder = 'truck' required name = 'truck' style='width:180px'>
+                        </p>
+                        <p>
+                            <h3 style="margin:5px 5px 5px 0px">Containers:</h3>
+                            <input type = 'text' placeholder = 'type:produce+type:produce' style='width:400px' name = 'containers'>
+                        </p>
+                        <p>
+                            <h3 style="margin:5px 5px 5px 0px">Weight:</h3>
+                            <input type = 'number' placeholder='kg' min='0' required name = 'weight' style='width:180px'>
+                        <p>
+                        <p>
+                            <input type="checkbox" name="Force" >
+                            force
+                        </p>
+                        <br>
+                        <input id="sendBtn" type = 'button' value="Submit" style='background-color:orange; border-radius:6px; border:solid 1px black; padding:10px 20px 10px 20px'>
+                    </form>
+                </div>
             </div>
-        </center>
     </body>
 </html>
