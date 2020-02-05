@@ -1,8 +1,7 @@
 import requests
 from flask import Flask
-import time
-
-#some comment :)
+from datetime import datetime, timezone
+import pytz
 
 app = Flask(__name__)
 
@@ -51,7 +50,9 @@ def monitor():
             for dev_path in dev_paths:
                 check(dev_services, dev_service, dev_path)
 
-        printM += ('<p style="color:#191970"> Last updated: '+time.ctime()+' (UTC)</p>')
+        tz = pytz.timezone('Asia/Jerusalem')
+        isr_now = datetime.now(tz)
+        printM += ('<p style="color:#191970"> Last updated: {}</p>'.format(isr_now))
         return printM
         
 
