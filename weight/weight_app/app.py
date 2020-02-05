@@ -67,7 +67,7 @@ def unknown():
     # Returns a list of all recorded containers that have unknown weight:
     # "id1" "id2"
     unknown_containers = ""
-    data = dbQuery("SELECT * FROM TruckContainers WHERE WeightProduce is NULL", isInsert=False)
+    data = dbQuery("SELECT * FROM TruckContainers WHERE WeightProduce is NULL", False)
     for tuple in data:
         unknown_containers = unknown_containers + str(tuple[0]) + '  '
     return unknown_containers
@@ -211,11 +211,17 @@ def get_item(id):
 @app.route("/weight", methods=['GET'])
 def weight():
 	if request.args.get("from"):
-		start = parse_time(request.args.get('from'))
+		try:
+			start = parse_time(request.args.get('from'))
+		except:
+			return Response(status=400)
 	else:
 		start = ((datetime.utcnow() + timedelta(hours=2)).strftime("%Y-%m-%d 00:00:00"))
 	if request.args.get("to"):
-		end = parse_time(request.args.get('to'))
+		try:
+			end = parse_time(request.args.get('to'))
+		except:
+			return Response(status=400)
 	else:
 		end = ((datetime.utcnow() + timedelta(hours=2)).strftime("%Y-%m-%d %H:%M:%S"))
 	if request.args.get("filter"):
