@@ -38,8 +38,14 @@ from datetime import datetime
 #     if code == 1:
 #         print(log)
 
-global status = 0
+
+status = 0
+url = "http://localhost:{}".format(os.environ['PORT'])
+
+
 def test_health():
+    global url
+    global status
     try:
         requests.get(url + '/health')
     except Exception as e :
@@ -89,6 +95,5 @@ def main():
     # #testing /unknown route
     #test__get_routes(url+"/unknown", "b'7  '")
 
-global url = "http://localhost:{}".format(os.environ['PORT'])
 
 main()
