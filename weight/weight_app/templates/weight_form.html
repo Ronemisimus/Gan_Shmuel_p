@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>input weight</title>
+    <head>
+          <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        function sendpost() {
+          $.post("/weight?" + $( "#inform" ).serialize() );
+        }
+
+        $(document).ready(function() {
+          $("#sendBtn").click(sendpost)
+        });
+    </script>
+    <body>
+        <center>
+            <div style="width: 50%; margin-top:10%; text-align: left; position: relative">
+                <form id="inform" method = 'POST' action = '/weight'>
+                    <p>
+                        Direction:</br>
+                        <input type="radio" name="direction" value="in" required> in 
+                        <input type="radio" name="direction" value="none" required> none 
+                        <input type="radio" name="direction" value="out" required> out
+                    </p>
+                    <p>
+                        Truck:</br>
+                        <input type = 'text' placeholder = 'truck' required name = 'truck'>
+                    </p>
+                    <p>
+                        Containers:</br>
+                        <input type = 'text' placeholder = 'type/produce,type/produce' name = 'containers'>
+                    </p>
+                    <p>
+                        Weight:</br>
+                        <input type = 'number' placeholder='kg' required name = 'weight'>
+                    <p>
+                    <p>
+                        <input type="checkbox" name="Force" >
+                        force
+                    </p>
+                    <input id="sendBtn" type = 'button' value="Submit">
+                </form>
+                <img src="/static/gan-shmuel.png" style="position: fixed; bottom:0px; right:0px; position: fixed;">
+            </div>
+        </center>
+    </body>
+</html>
