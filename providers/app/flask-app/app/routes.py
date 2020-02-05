@@ -116,17 +116,11 @@ def update_truck(truck_id):
       item_url = '{0}item/{1}'.format(base_url, truck.id)
       try:
         res = requests.get(item_url, data={'from': from_date, 'to': to_date})
+        res = json.dumps(res.json())
       except Exception as e:
         return Response(str(e))
 
-      data = {
-        "id": "test_id",
-        "tara": 50,
-        "sessions": [14, 54, 60]
-      }
-      temp_json = json.dumps(data);
-      return Response(temp_json, mimetype="application/json")
-      # return Response(res, mimetype='application/json')
+      return Response(res, mimetype='application/json')
 
 @app.route('/bill/<id>')
 def getBill(id):

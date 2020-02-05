@@ -28,7 +28,7 @@ services:
       - "MYSQL_PASSWORD=${DB_PASSWORD}"
       - "MYSQL_ROOT_PASSWORD=root"
     volumes:
-      - ./db/init:/docker-entrypoint-initdb.d/:ro
+      - ${PWD}/db/init/init.sql:/docker-entrypoint-initdb.d/init.sql/:ro
       - provider-db:/var/lib/mysql
     expose: 
       - ${DB_EXPOSE}
