@@ -241,7 +241,7 @@ def rates():
         if exist_rate is None:
           db.session.add(new_rate)
         else:
-          exist_rate.rateGET = new_rate.rate
+          exist_rate.rate = new_rate.rate
         try:
           db.session.commit()
         except Exception as e:
