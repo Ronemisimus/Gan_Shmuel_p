@@ -1,10 +1,11 @@
 import requests, json
-from flask import request, jsonify, Response, json, redirect, url_for
+from flask import request, jsonify, Response, json, redirect, url_for, send_file
 from app import app, db
 from app.models import Truck, Provider, Rate
 from datetime import datetime, timezone
-import xlrd, os
+import xlrd, os, logging
 
+last_opend_file=[ ]
 
 def create_provider(provider_name):
   provider = Provider(name=provider_name)
@@ -210,18 +211,21 @@ def getBill(id):
 
 @app.route('/rates', methods=['GET' , 'POST'])
 def rates():
-    if request.method=='GET':
-      return "Boo!!! O_O"      
-
-    elif request.method=='POST':
-      filename=request.form['file']
+    if request.method=='POST':
       try:
-        book = xlrd.open_workbook(os.getcwd()+'/in/'+filename+'.xlsx', on_demand=True)
+        filename=request.form['file']
       except:
-          print ("File doesn't exists in '/in' folder.")
+        return "No file name was given. Please mention wanted file's name inside the form."
+      finally:
+        full_path=os.getcwd()+'/in/'+filename+'.xlsx'
+        last_opend_file.extend([filename, full_path])  ## used inorder to restore the file in the GET method
+      try:
+        book = xlrd.open_workbook(full_path, on_demand=True)
+      except:
+          print ("File doesn't exists in '/in' folder.") #ToDo - insert to a logger
           return Response(status=404)
       else: ## Case file was opend successfuly
-        sheet = book.sheet_by_index(0) ## DOTO: change to find sheet  by name
+        sheet = book.sheet_by_index(0) ## ToDo: change to find sheet by name
         for i in range(1,sheet.nrows):
           for j in range(sheet.ncols):
             if j==0:
@@ -231,7 +235,6 @@ def rates():
             elif j==2:
               scope = str(sheet.cell(i,j).value )
           new_rate_candidate=Rate.query.filter_by(product_id=product, scope=scope).first()
-          print('{}'.format(new_rate_candidate))
           if new_rate_candidate is None:
             new_rate = Rate(product_id=product,rate=rate,scope=scope)
             try:
@@ -243,7 +246,14 @@ def rates():
           else:
             new_rate_candidate.rate=rate
             db.session.commit()
-            print("bla")
 
         book.release_resources()
         return 'Done'
+
+    elif request.method=='GET':
+      try:
+        return send_file(last_opend_file[-1], mimetype='application/octet-stream',
+        attachment_filename=last_opend_file[-2]+'.xlsx',
+        as_attachment=True)
+      except FileNotFoundError:
+        return Response(status=404)   
