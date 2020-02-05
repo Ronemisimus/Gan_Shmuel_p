@@ -13,24 +13,30 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = "gan.shmuel.ashdod@gmail.com"
 app.config['MAIL_PASSWORD'] = "nA@UemKJPlo0GjperLN4"
 
-weight_group = [
-    "nati-elmaliach",
-    "Aransh",
-    "ozshm",
-    "KateDvo" 
-]
-
-providers_group = {
-    "M-Wittner",
-    "RonBenMoshe",
-    "Neta182" 
+weight_team = {
+    "nati-elmaliach" : "natielmaliach3197@gmail.com",
+    "Aransh" : "aranshavit@gmail.com",
+    "ozshm" : "ozshmuel@gmail.com",
+    "KateDvo" : "kate.dvoretsky@gmail.com"
 }
 
-devops_group = {
-    "IgorEnenberg",
-    "itzik-alayev",
-    "ChrisPushkin" 
+weight_team_lead = "nati-elmaliach"
+
+providers_team = {
+    "M-Wittner" : "",
+    "RonBenMoshe" : "",
+    "Neta182" : ""
 }
+
+providers_team_lead = "RonBenMoshe"
+
+devops_team = {
+    "IgorEnenberg" : "eigorek@gmail.com",
+    "itzik-alayev" : "",
+    "ChrisPushkin" : "chrispushkin@gmail.com"
+}
+
+devops_team_lead = "ChrisPushkin"
 
 mail = Mail(app)
 
@@ -80,8 +86,22 @@ def tests_report(data):
 
     log_entry("\n" + entry + "\n\n" + messages, "test_log.txt")
 
+def gitOrGmail(team, name, email):
+    if mail.find(gmail):
+        return mail
+    else:
+        return team[name]
+
+def emailRecipient(recipients, pusher, pushers_email, team):
+    team_lead = "{}_lead".format(team)
+    recipients.append(gitOrGmail(team, team_lead, team[team_lead]))
+
+    if pusher != team_lead:
+        recipients.append(gitOrGmail(team, pusher, pushers_email))
+
+
 @app.route('/log', methods=['POST'])
-def test():
+def log():
     data = request.get_json()
     commits_report(data)
     tests_report(data)   
@@ -89,16 +109,13 @@ def test():
     pushers_email = "{}".format(data['pusher']['email'])
     pusher = "{}".format(data['pusher']['name'])
     recipients = []
-    if pusher in weight_group:
-        recipients = ["natielmaliach3197@gmail.com", pushers_email]
-        # recipients = ["eigorek@gmail.com"]
-    elif pusher in providers_group:
-        recipients = ["ronmoshe333@gmail.com", pushers_email]
-        # recipients = ["eigorek@gmail.com"]
-    elif pusher in devops_group:
-        recipients = ["chrispushkin@gmail.com", pushers_email]
-        # recipients = ["eigorek@gmail.com"]
-        #
+
+    if pusher in weight_team:
+        recipients = emailRecipient(recipients, pusher, pushers_email, weight_team)
+    elif pusher in providers_team:
+        recipients = emailRecipient(recipients, pusher, pushers_email, providers_team)
+    elif pusher in devops_team:
+        recipients = emailRecipient(recipients, pusher, pushers_email, devops_team)
 
     entry = "Tests and Commits Reports for {}'s Latest Push".format(data['pusher']['name'])
 
