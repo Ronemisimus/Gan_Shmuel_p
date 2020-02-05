@@ -120,7 +120,7 @@ def log():
     entry = "Tests and Commits Reports for {}'s Latest Push".format(data['pusher']['name'])
 
     send_email(entry, ["test_log.txt", "committers_log.txt"], recipients)    
-
+#
     return Response("200")
 
 if __name__ == '__main__':
