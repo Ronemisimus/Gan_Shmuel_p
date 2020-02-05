@@ -69,7 +69,8 @@ def tests_report(data):
         "test1" : "success",
    	    "test2" : "failure",
    	    "test3" : "success",
-        "test4" : "success"
+        "test4" : "success",
+        "test5" : "success"
     }
     
     for k, v in data["tests"].items(): 
