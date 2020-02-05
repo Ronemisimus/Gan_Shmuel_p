@@ -57,14 +57,12 @@ def test_weight_route( path, expected):
     try:
         res = requests.get(url + path)
         res = json.dumps(res.json())
-    except Exception as e:
-        status = 1
-    else:
         expected_res = json.dumps(expected)
-        print(expected_res)
-        print(res)
-        status = 0 if expected_res == res else 1
-        
+        print(type(expected_res))
+        print(type(res))
+    except Exception as e:
+        print("inside exception")
+        status = 1
     
 def main():
     
