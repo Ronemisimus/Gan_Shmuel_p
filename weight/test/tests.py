@@ -62,7 +62,7 @@ def test_weight_route( path, expected):
         expected_res = json.dumps(expected)
     except Exception as e:
         status = 1
-    
+
     if res != expected_res:
         status = 1
 
@@ -77,13 +77,11 @@ def main():
 
      # testing item route
     # test__get_routes(url+"/item/truck1", """id":"truck1","sessions":[35],"tara":92""")
-    # test__get_routes(url+"/item/c1","""{}""")
-    # test__get_routes(url+"/item/Truck1?from=20200202112732&to=20211231011500","""id":"Truck1","sessions":[35],"tara":92""")
+    
 
     # # testing get weight route
     # test__get_routes(url+"/weight?from=10000303000000&to=30000303000000&filter=in",'"35":{"bruto":"178","containers":"C1,C2","direction":"in","neto":"92","produces":"Apples,Oranges"},"36":{"bruto":"125","containers":"C1","direction":"In","neto":"12","produces":"Test,Tomato"}')
-    # test__get_routes(url+"/weight?from=10000303000000&to=30000303000000",'"35":{"bruto":"178","containers":"C1,C2","direction":"in","neto":"92","produces":"Apples,Oranges"},"36":{"bruto":"125","containers":"C1","direction":"In","neto":"12","produces":"Test,Tomato"}')
-    # test__get_routes(url+"/weight?", "{")
+  
 
     #test_rout_weight(url+"/weight",{})
     #Testing Inserting Transaction with 3 containers using POST /weight
@@ -101,7 +99,7 @@ def main():
 
     #testing batch-file route
     # test__post_routes(url+"/batch-weight?filename=containers3.json", "OK")
-    # test__post_routes(url+"/batch-weight?filename=containers3.json'", "database")
+  
 
     # #testing /health route
     #test__get_routes(url+"/health", "OK")
