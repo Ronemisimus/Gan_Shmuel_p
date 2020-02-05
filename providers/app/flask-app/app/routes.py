@@ -1,12 +1,13 @@
-import sys
-import requests, json 
-from flask import request, jsonify, Response, json, redirect, url_for
+import requests, json
+from flask import request, jsonify, Response, json, redirect, url_for, send_file
 from app import app, db
 from app.models import Truck, Provider, Rate
 from datetime import datetime, timezone
-import xlrd, os
+import xlrd, os, sys
 
-NULL=0
+allowed_ext = ['csv', 'xls', 'xlsx']
+base_url = 'http://18.194.232.207:8089/'
+
 def create_provider(provider_name):
   provider = Provider(name=provider_name)
   check_provider=provider.query.filter_by(name=provider_name).first()
@@ -45,7 +46,7 @@ def provider():
 
 @app.route('/provider/<provider_id>' , methods=['PUT'])
 def updateProvider(provider_id):
-  provider_new_name=request.args.get('provider_name')
+  provider_new_name=request.form['provider_name']
   if Provider.query.filter_by(name=provider_new_name).first() is None: 
     search_provider_id=Provider.query.filter_by(id=provider_id).first()
     if search_provider_id is None:
@@ -99,6 +100,7 @@ def update_truck(truck_id):
       }
       return Response(json.dumps(res_truck), mimetype="application/json")
     elif request.method == 'GET':
+      global base_url
       truck = Truck.query.filter_by(id=truck_id).first()
       if truck is None:
         return Response('Truck ({}) Not Found'.format(truck_id), status=404)
@@ -112,7 +114,6 @@ def update_truck(truck_id):
         to_date = str(datetime.strptime(str(to_param), '%Y%m%d%H%M%S'))
       except Exception as e:
         return Response(str(e), status=400)
-      base_url = 'http://18.194.232.207:8088/'
       item_url = '{0}item/{1}'.format(base_url, truck.id)
       try:
         res = requests.get(item_url, data={'from': from_date, 'to': to_date})
@@ -124,6 +125,7 @@ def update_truck(truck_id):
 
 @app.route('/bill/<id>')
 def getBill(id):
+  global base_url
   provider_id=Provider.query.filter_by(id=id).first()
   if provider_id is None:
     return Response(json.dumps('Provider ({}) Not Found'.format(id)),mimetype='application/json')
@@ -134,17 +136,28 @@ def getBill(id):
   truck_count=0
   session_count=0
   from_date=request.args.get('from')
-  if from_date is None:
-    return Response("Please Enter A Starting date For The Bill!!!!!",mimetype='text/plain')
+  try:
+    from_date = str(datetime.strptime(str(request.args.get('from')), '%Y%m%d%H%M%S'))
+  except Exception as e:
+    return Response(str(e), status=400)
   to_param=request.args.get('to')
   to_date = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S') if to_param is None else to_param
   trucks_of_provider=Truck.query.filter_by(provider_id=id).all()
   if not trucks_of_provider:
     return Response(json.dumps("Provider {} has no truck regiseted".format(provider_id)),mimetype='application/json')
   else:
+    provider_name=Provider.query.filter_by(id=id).first()
+    product_amount = {}
+    product_session_count = {}
+    products_list=[]
+    truck_count=0
+    session_count=0
+    from_date=request.args.get('from')
+    to_param=request.args.get('to')
+    to_date = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S') if to_param is None else to_param
+    trucks_of_provider=Truck.query.filter_by(provider_id=id).all()
     for truck in trucks_of_provider:
       truck_count+=1
-      base_url = 'http://18.194.232.207:8088/'
       item_url = '{0}item/{1}'.format(base_url, truck.id)
       try:
         res = requests.get(item_url, data={'from': from_date, 'to': to_date})
@@ -155,7 +168,7 @@ def getBill(id):
         for session in res['sessions']:
           session_count+=1
           try:
-            res_session=requests.get('http://18.194.232.207:8088/session/{}'.format(session))
+            res_session=requests.get('{}session/{}'.format(base_url,session))
           except Exception as e:
             return Response(str(e))
           res_session=res_session.json()
@@ -171,8 +184,6 @@ def getBill(id):
     total_pay=0
     generic_scope='ALL'
     for key in product_session_count:
-      print(key)
-      print(provider_name.name)
       if Rate.query.filter_by(product_id=key , scope=id) is None:
         if Rate.query.filter_by(product_id=key , scope=provider_name.name) is None:
           rate=Rate.query.filter_by(product_id=key , scope=generic_scope).first()
@@ -200,40 +211,46 @@ def getBill(id):
 
 @app.route('/rates', methods=['GET' , 'POST'])
 def rates():
-    if request.method=='GET':
-      return "Boo!!! O_O"      
-
-    elif request.method=='POST':
+  global filename, full_path, allowed_ext
+  if request.method=='POST':
+    try:
       filename=request.form['file']
-      try:
-        book = xlrd.open_workbook(os.getcwd()+'/in/'+filename+'.xlsx', on_demand=True)
-      except:
-          print ("File doesn't exists in '/in' folder.")
-          return Response(status=404)
-      else: ## Case file was opend successfuly
-        sheet = book.sheet_by_index(0) ## DOTO: change to find sheet  by name
-        for i in range(1,sheet.nrows):
-          for j in range(sheet.ncols):
-            if j==0:
-              product=str(sheet.cell(i,j).value )
-            elif j==1:
-              rate = int(sheet.cell(i,j).value )
-            elif j==2:
-              scope = str(sheet.cell(i,j).value )
-          new_rate_candidate=Rate.query.filter_by(product_id=product, scope=scope).first()
-          print('{}'.format(new_rate_candidate))
-          if new_rate_candidate is None:
-            new_rate = Rate(product_id=product,rate=rate,scope=scope)
-            try:
-              db.session.add(new_rate)
-              db.session.commit()
-            except:
-              print ("Coldn't insert data to billdb.table 'Rates'")
-              return Response(status=500)
-          else:
-            new_rate_candidate.rate=rate
-            db.session.commit()
-            print("bla")
-
-        book.release_resources()
-        return 'Done'
+      file_ext = filename.split('.')[-1]
+      if file_ext not in allowed_ext:
+        return Response('File type is not allowed ({})'.format(file_ext), status=400)
+    except:
+      return "No file name was given. Please mention wanted file's name inside the form."
+    finally:
+      full_path=os.getcwd()+'/in/'+filename
+    try:
+      book = xlrd.open_workbook(full_path, on_demand=True)
+    except:
+      return Response("File ({}) not found in folder".format(filename), status=404)
+    else: ## Case file was opend successfuly
+      sheet = book.sheet_by_index(0) ## ToDo: change to find sheet by name
+      for rownum in range(1,sheet.nrows):
+        temp_obj={}
+        for col in range(0, sheet.ncols):
+          col_name = sheet.col_values(col)[0].lower()
+          value = sheet.row_values(rownum)[col]  if col_name != 'product' else str(sheet.row_values(rownum)[col]).split('.')[0]
+          temp_obj[col_name] = value
+        new_rate = Rate(product_id=temp_obj['product'], scope=temp_obj['scope'], rate=temp_obj['rate'])
+        exist_rate = Rate.query.filter_by(product_id=new_rate.product_id, scope=new_rate.scope).first()
+        if exist_rate is None:
+          db.session.add(new_rate)
+        else:
+          exist_rate.rateGET = new_rate.rate
+        try:
+          db.session.commit()
+        except Exception as e:
+          msg = 'Could not insert new rate({})\n{}\n'.format(temp_obj, e)
+          return Response(msg, status=400)
+    book.release_resources()
+    del book
+    return Response('Done')
+  elif request.method=='GET':
+    try:
+      return send_file(filename_or_fp=full_path,mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',cache_timeout=0,as_attachment=True)
+    except FileNotFoundError as e:
+      return Response(str(e), status=404)  
+        
