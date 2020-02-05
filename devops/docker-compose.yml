@@ -11,6 +11,7 @@ services:
       - /ci-server/test:/ci-server/test
       - /ci-server/stage:/ci-server/stage
       - /ci-server/production:/ci-server/production
+    network_mode: host
 
   logs:
     build: ./monitoring/logs
