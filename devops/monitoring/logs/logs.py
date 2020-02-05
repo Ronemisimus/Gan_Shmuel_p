@@ -32,7 +32,7 @@ providers_team_lead = "RonBenMoshe"
 
 devops_team = {
     "IgorEnenberg" : "eigorek@gmail.com",
-    "itzik-alayev" : "",
+    "itzik-alayev" : "startukk@gmail.com",
     "ChrisPushkin" : "chrispushkin@gmail.com"
 }
 
@@ -71,16 +71,12 @@ def commits_report(data):
 def tests_report(data):
     messages = ""
 
-    data["tests"] = { 
-        "test1" : "success",
-   	    "test2" : "failure",
-   	    "test3" : "success",
-        "test4" : "success",
-        "test5" : "success"
-    }
-    
-    for k, v in data["tests"].items(): 
-        messages += "{} {}\n".format(k, "was successful." if v == "success" else "has failed.")
+    # data["tests"] = { 
+    #     "app_name" : "weight",
+    #     "test_result" : "failure"
+    # }
+
+    messages += "Tests for {}: {}".format(data["tests"]["app_name"], data["tests"]["test_result"])
 
     entry = "Dummy Test Report for {}'s Latest Push".format(data['pusher']['name'])
 
