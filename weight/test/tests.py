@@ -50,12 +50,12 @@ def main():
     test__get_routes(url+"/health", "b'OK'")
 
     # #testing /unknown route
-    # test__get_routes(url+"/unknown", "b'7  '")
+    test__get_routes(url+"/unknown", "b'7  '")
 
-    # #testing session  route
-    # test__get_routes(url+"/session/35" ,'{"id": "35","truckID": "Truck1","items": [{"produce": "Oranges", "bruto" : "46", "neto": "null"},{"produce": "Apples", "bruto" : "76", "neto": "null"}]}')
-    # test__get_routes(url+"/session/36" ,"""{"id": "36","truckID": "Truck1","items": [{"produce": "Tomato", "bruto" : "24", "neto": "null"},{"produce": "Test", "bruto" : "None", "neto": "null"}]}""")
-    # test__get_routes(url+"/session/", "")
+    #testing session  route
+    test__get_routes(url+"/session/35" ,'{"id": "35","truckID": "Truck1","items": [{"produce": "Oranges", "bruto" : "46", "neto": "null"},{"produce": "Apples", "bruto" : "76", "neto": "null"}]}')
+    test__get_routes(url+"/session/36" ,"""{"id": "36","truckID": "Truck1","items": [{"produce": "Tomato", "bruto" : "24", "neto": "null"},{"produce": "Test", "bruto" : "None", "neto": "null"}]}""")
+    test__get_routes(url+"/session/", "")
 
     # # test_rout_weight(url+"/weight",{})
 
