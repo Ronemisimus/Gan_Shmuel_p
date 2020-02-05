@@ -67,7 +67,7 @@ def unknown():
     # Returns a list of all recorded containers that have unknown weight:
     # "id1" "id2"
     unknown_containers = ""
-    data = dbQuery("SELECT * FROM Containers WHERE Weight is NULL", isInsert=False)
+    data = dbQuery("SELECT * FROM Containers WHERE Weight is NULL", isInsertOrUpdate=False)
     for tuple in data:
         unknown_containers = unknown_containers + tuple[0] + '  '
     return unknown_containers
@@ -143,7 +143,7 @@ def get_item(id):
     try:
         #if id is int dealing with containers
         id = int(id)
-        ans = dbQuery("SELECT * FROM TruckContainers where id = {} ".format(id), isInsert=False)
+        ans = dbQuery("SELECT * FROM TruckContainers where id = {} ".format(id), isInsertOrUpdate=False)
        
         #if id is not exist
         if not len(ans):
@@ -163,7 +163,7 @@ def get_item(id):
                     '%Y-%m-%d %T')
                     AND t.TimeOut <= STR_TO_DATE('2021-12-01 12:00:00',
                     '%Y-%m-%d %T')
-                    AND t2.id = {};'''.format(id), isInsert=False)
+                    AND t2.id = {};'''.format(id), isInsertOrUpdate=False)
         
         return {"id":str(id) , "tara":data[0][1] , "sessions":data[0][2]}
         
@@ -218,7 +218,6 @@ def weight():
 		end = parse_time(request.args.get('to'))
 	else:
 		end = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-	# filt = request.args.get('filter').split(",") or "('in','out','none')"
 	if request.args.get("f"):
 		filt=("("+request.args.get("f")+")").replace("(","('").replace(",","','").replace(")","')")
 	else:
@@ -282,8 +281,11 @@ def weightpost():
 			else:
 				return Response(status=400)
 		else:
-			TransactionID = transaction[0][0]
-			dbQuery("UPDATE Transactions SET LastWeight = '%s' WHERE ID = '%s'"%(weight,TransactionID), True)
+			if len(transaction) > 0:
+				TransactionID = transaction[0][0]
+				dbQuery("UPDATE Transactions SET LastWeight = '%s' WHERE ID = '%s'"%(weight,TransactionID), True)
+			else:
+				return Response(status=400)
 		KnownContainersQ = dbQuery('''SELECT t.ContainerID, t.Produce
 		FROM
 			weightDB.TruckContainers t
