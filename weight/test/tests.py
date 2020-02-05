@@ -121,12 +121,12 @@ def main():
     timeOut=datetime.now().strftime("%Y%m%d%H%M%S")
 
     # # Testing if Transaction was entered successfully
-    #test_weightafterPost_route("/weight?from=%s&to=%s&filter=out"%(str(timeIn),str(timeOut)),'{"bruto":"390","containers":"C1,C2","direction":"Out","neto":"210","produces":"Bananas,Peaches"}')
+    test_weightafterPost_route("/weight?from=%s&to=%s&filter=out"%(str(timeIn),str(timeOut)),'{"bruto":"390","containers":"C1,C2","direction":"Out","neto":"210","produces":"Bananas,Peaches"}')
 
 
     # #testing /health route
     test_health()
-    test_batch_weight("/batch-weight", "file not found or it already in database")
+    #test_batch_weight("/batch-weight", "file not found or it already in database")
 
     # testing /unknown route
     test_unknown("/unknown",{"7":{"ContainerID":"C1","Produce":"Test","TransactionID":"36"},"8":{"ContainerID":"C1","Produce":"Bananas","TransactionID":"37"},"9":{"ContainerID":"C2","Produce":"Peaches","TransactionID":"37"}})
