@@ -112,6 +112,8 @@ def test_get_routes(path , expected):
         status = 1
 
     if res != expected_res:
+        print(res)
+        print(expected_res)
         status = 1
 
 
