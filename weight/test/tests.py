@@ -106,7 +106,7 @@ def test_get_routes(path , expected):
     expected_res = ''
 
     try:
-        res = requests.get(url + path, timeout=5)
+        res = requests.get(url + path)
         res = json.dumps(res.json())
         expected_res = json.dumps(expected)
     except Exception as e:
