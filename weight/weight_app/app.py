@@ -67,7 +67,7 @@ def unknown():
     # Returns a list of all recorded containers that have unknown weight:
     # "id1" "id2"
     unknown_containers = ""
-    data = dbQuery("SELECT * FROM Containers WHERE Weight is NULL", isInsert=False)
+    data = dbQuery("SELECT * FROM Containers WHERE Weight is NULL", isInsertOrUpdate=False)
     for tuple in data:
         unknown_containers = unknown_containers + tuple[0] + '  '
     return unknown_containers
@@ -143,7 +143,7 @@ def get_item(id):
     try:
         #if id is int dealing with containers
         id = int(id)
-        ans = dbQuery("SELECT * FROM TruckContainers where id = {} ".format(id), isInsert=False)
+        ans = dbQuery("SELECT * FROM TruckContainers where id = {} ".format(id), isInsertOrUpdate=False)
        
         #if id is not exist
         if not len(ans):
@@ -163,7 +163,7 @@ def get_item(id):
                     '%Y-%m-%d %T')
                     AND t.TimeOut <= STR_TO_DATE('2021-12-01 12:00:00',
                     '%Y-%m-%d %T')
-                    AND t2.id = {};'''.format(id), isInsert=False)
+                    AND t2.id = {};'''.format(id), isInsertOrUpdate=False)
         
         return {"id":str(id) , "tara":data[0][1] , "sessions":data[0][2]}
         
@@ -218,13 +218,12 @@ def weight():
 		end = parse_time(request.args.get('to'))
 	else:
 		end = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-	# filt = request.args.get('filter').split(",") or "('in','out','none')"
 	if request.args.get("f"):
 		filt=("("+request.args.get("f")+")").replace("(","('").replace(",","','").replace(")","')")
 	else:
 		filt = "('in','out','none')"
 
-	sql='''SELECT t2.TransactionID, t.Status, (SUM(t2.WeightProduce) + SUM(c.Weight)) AS bruto, SUM(t2.WeightProduce) AS neto, GROUP_CONCAT(DISTINCT t2.Produce) AS products, GROUP_CONCAT(DISTINCT t2.ContainerID) AS Containers
+	sql='''SELECT t2.TransactionID, t.Status, (SUM(t2.WeightProduce) + SUM(c.Weight) + t.LastWeight) AS bruto, SUM(t2.WeightProduce) AS neto, GROUP_CONCAT(DISTINCT t2.Produce) AS products, GROUP_CONCAT(DISTINCT t2.ContainerID) AS Containers
 	FROM
 		weightDB.Transactions t
 	INNER JOIN weightDB.TruckContainers t2 ON
@@ -315,7 +314,7 @@ def weightpost():
 			AND t.WeightProduce IS NULL'''%(TransactionID,missingContainerDetails[0],missingContainerDetails[1]),False)[0]
 		weightDifference = str(int(transaction[0][1]) - int(weight) - int(missingContainer[1]))
 		dbQuery("UPDATE TruckContainers SET WeightProduce = '%s' WHERE ID = '%s'"%(weightDifference,missingContainer[0]), True)
-	return redirect(url_for('input'))
+	return Response(status=200)
 
 @app.route("/input", methods=['GET'])
 def input():
