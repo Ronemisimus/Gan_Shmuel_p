@@ -108,7 +108,7 @@ def session(id):
     else :
         json = '{"id": "' + str(id) + '","truckID": "' + str(data[0][4]) + '","items": ['
         for tuple in data:
-            if tuple[3] != "out":
+            if tuple[3] != "Out":
                 json += '{' +'"produce": "{}", "bruto" : "{}", "neto": "{}"'.format(tuple[0],tuple[1], "null")+ '},'
             else:
                 json += '{' +'"produce": "{}", "bruto" : "{}", "neto": "{}"'.format(tuple[0],tuple[1], tuple[2])+ '},'
