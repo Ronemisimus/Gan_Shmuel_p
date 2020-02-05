@@ -67,10 +67,10 @@ def main():
     # # test__post_routes(url+"/weight?direction=out&truck=DebugTruck&containers=&weight=150","")
     # # timeOut=datetime.now().strftime("%Y%m%d%H%M%S")
 
-    #  # testing item route
-    # test__get_routes(url+"/item/truck1", """id":"truck1","sessions":[35],"tara":92""")
-    # test__get_routes(url+"/item/c1","""{}""")
-    # test__get_routes(url+"/item/Truck1?from=20200202112732&to=20211231011500","""id":"Truck1","sessions":[35],"tara":92""")
+     # testing item route
+    test__get_routes(url+"/item/truck1", """id":"truck1","sessions":[35],"tara":92""")
+    test__get_routes(url+"/item/c1","""{}""")
+    test__get_routes(url+"/item/Truck1?from=20200202112732&to=20211231011500","""id":"Truck1","sessions":[35],"tara":92""")
    
 
     # # Testing if Transaction was entered successfully
