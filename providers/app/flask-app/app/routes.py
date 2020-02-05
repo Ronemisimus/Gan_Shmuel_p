@@ -6,7 +6,7 @@ from app.models import Truck, Provider, Rate
 from datetime import datetime, timezone
 import xlrd, os
 
-
+NULL=0
 def create_provider(provider_name):
   provider = Provider(name=provider_name)
   check_provider=provider.query.filter_by(name=provider_name).first()
@@ -127,13 +127,15 @@ def getBill(id):
   provider_id=Provider.query.filter_by(id=id).first()
   if provider_id is None:
     return Response(json.dumps('Provider ({}) Not Found'.format(id)),mimetype='application/json')
-  provider_name=Provider.query.filter_by(id=id)
+  provider_name=Provider.query.filter_by(id=id).first()
   product_amount = {}
   product_session_count = {}
   products_list=[]
   truck_count=0
   session_count=0
   from_date=request.args.get('from')
+  if from_date is None:
+    return Response("Please Enter A Starting date For The Bill!!!!!",mimetype='text/plain')
   to_param=request.args.get('to')
   to_date = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S') if to_param is None else to_param
   trucks_of_provider=Truck.query.filter_by(provider_id=id).all()
@@ -142,79 +144,57 @@ def getBill(id):
   else:
     for truck in trucks_of_provider:
       truck_count+=1
+      base_url = 'http://18.194.232.207:8088/'
+      item_url = '{0}item/{1}'.format(base_url, truck.id)
       try:
-        res=request.get('http://localhost:8086/truck/{}?from=20200101000000&to=20200201000000'.format(truck.id))
-      except:
-        return Response(status=404)
-      # { 
-      # "id": <str>,
-      # "tara": <int>, // last known tara in kg
-      # "sessions": [ <id1>,...] 
-      #     }
-      for session in res['sessions']:
-        session_count+=1
-        try:
-          res_session=request.get('http://18.194.232.207:8088/session/{}'.format(session))
-        except:
-          return Response(status=400)
-        print(res_session,file=sys.stderr)
-          # method get session id and return json in format:
-      # [{
-      # 	"id": "<id>",
-      # 	"truckID": "<truck id>",
-      # 	"items":
-      #  [{
-      # 		"produce": "<type of produce>",
-      # 		"bruto": "<weight bruto>",
-      # 		"neto": "<weight_neto| null>"
-      # 	}]
-      # }]
-        for product in res_session['items']:
-          if product['produce'] in product_session_count:
-            product_session_count[product['produce']]+=1
-          else:
-            product_session_count[product['produce']]=1
-          if product in product_amount:
-            product_amount[product['produce']]+=product['neto']
-          else:
-            product_amount[product['produce']]=product_amount[product['produce']]
-
-    #  {
-    #   "id": <str>,
-    #   "name": <str>,
-    #   "from": <str>,
-    #   "to": <str>,
-    #   "truckCount": <int>,
-    #   "sessionCount": <int>,
-    #   "products": [
-    #     { "product":<str>,
-    #       "count": <str>, // number of sessions
-    #       "amount": <int>, // total kg
-    #       "rate": <int>, // agorot
-    #       "pay": <int> // agorot
-    #     },...
-    #   ],
-    #   "total": <int> // agorot
-    # }
-    total_pay=0
-    for key in product_session_count:
-      if Rate.query.filter_by(product_id=key , scope=id) is None:
-        rate=json.loads(Rate.query.filter_by(product_id=key , scope=id).first())
+        res = requests.get(item_url, data={'from': from_date, 'to': to_date})
+        res = res.json()
+      except Exception as e:
+        return Response(str(e))
       else:
-        rate=json.loads(Rate.query.filter_by(product_id=key , scope='ALL').first())
+        for session in res['sessions']:
+          session_count+=1
+          try:
+            res_session=requests.get('http://18.194.232.207:8088/session/{}'.format(session))
+          except Exception as e:
+            return Response(str(e))
+          res_session=res_session.json()
+          for product in res_session['items']:
+            if product['produce'] in product_session_count:
+              product_session_count[product['produce']]+=1
+            else:
+              product_session_count[product['produce']]=1
+            if product['produce'] in product_amount:
+              product_amount[product['produce']]+=product['bruto']
+            else:
+              product_amount[product['produce']]=product['bruto']
+    total_pay=0
+    generic_scope='ALL'
+    for key in product_session_count:
+      print(key)
+      print(provider_name.name)
+      if Rate.query.filter_by(product_id=key , scope=id) is None:
+        if Rate.query.filter_by(product_id=key , scope=provider_name.name) is None:
+          rate=Rate.query.filter_by(product_id=key , scope=generic_scope).first()
+      else:
+        rate=Rate.query.filter_by(product_id=key , scope=id).first()
       print(type(rate), file=sys.stderr)
-      product_details={'product':key ,'count':product_session_count[key],'amount':product_amount[key],'rate':rate.rate,'pay':(rate.rate*product_amount[key])}
+      print(rate.rate)
+      print(type(product_amount[key]))
+      product_details={'product':key ,'count':product_session_count[key],'amount':product_amount[key],'rate':rate.rate,'pay':(rate.rate*int(product_amount[key]))}
       total_pay+=product_details['pay']
       products_list.append(product_details)
-  res_data = {'ID':id ,
-    'Name':provider_name,
+  res_data = {
+    'ID':id ,
+    'Name':provider_name.name,
     'From':from_date,
     'To':to_date,
     'Truck_count':truck_count,
     'Session_Count':session_count,
-    'Products':products_list,
+    'Products':products_list ,
     'Total':total_pay}
-  return Response(res_data,mimetype='application/json')
+  print(res_data)
+  return Response(json.dumps(res_data),mimetype='application/json')
 
 
 

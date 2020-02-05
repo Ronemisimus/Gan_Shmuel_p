@@ -1,3 +1,4 @@
+ 
 --
 -- Database: `billdb`
 --
@@ -36,12 +37,11 @@ CREATE TABLE IF NOT EXISTS `Trucks` (
 --
 
 
-INSERT INTO Provider (`name`) VALUES ('ALL'), ('pro1'),
-('pro2');
+INSERT INTO Provider (`name`) VALUES ('Ron'), ('pro1'),
+('pro2'),('ALL');
 
 INSERT INTO Rates (`product_id`, `rate`, `scope`) VALUES ('first', 2, 'ALL'),
-('second', 4, 'pro1');
+('second', 4, 'pro1'),('Oranges',5,'10001'),('Apples',7,'10001');
 
 INSERT INTO Trucks (`id`, `provider_id`) VALUES ('134-33-443', 2),
 ('222-33-111', 1), ('Truck1', 10001);
-
