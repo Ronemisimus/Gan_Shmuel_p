@@ -121,7 +121,7 @@ def main():
     timeOut=datetime.now().strftime("%Y%m%d%H%M%S")
 
     # # Testing if Transaction was entered successfully
-    test_weightafterPost_route("/weight?from=%s&to=%s&filter=out"%(str(timeIn),str(timeOut)),'{"bruto":"390","containers":"C1,C2","direction":"Out","neto":"210","produces":"Bananas,Peaches"}')
+    #test_weightafterPost_route("/weight?from=%s&to=%s&filter=out"%(str(timeIn),str(timeOut)),'{"bruto":"390","containers":"C1,C2","direction":"Out","neto":"210","produces":"Bananas,Peaches"}')
 
 
     # #testing /health route
