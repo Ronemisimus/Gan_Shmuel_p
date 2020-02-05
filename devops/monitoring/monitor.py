@@ -32,15 +32,15 @@ def monitor():
     def check(services, service, path):
         global printM
         url = 'http://18.194.232.207:'+services[service]+path
-        htmlS = '<a href='+url+'>'+service+path+'</a>'
+        htmlS = '<a href='+url+' style="color:#4682B4">'+service+path+'</a>'
         try:   
             response = requests.get(url) #make sure the request is not made localy
             if response.status_code == 200:
-                printM += (htmlS+' is up!<br>')
+                printM += ('<span style="color:#006400">'+htmlS+' is up!</span><br>')
             else:
                 printM += (htmlS+' returned:'+response.status_code+'<br>')
         except:
-            printM += (htmlS+' is unreachable<br>')
+            printM += ('<span style="color:#8B0000"><b>'+htmlS+' is unreachable</span><br>')
 
     while True:
         for service in services:
