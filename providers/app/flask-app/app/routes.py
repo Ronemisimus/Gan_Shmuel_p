@@ -7,6 +7,7 @@ import xlrd, os, sys
 
 allowed_ext = ['csv', 'xls', 'xlsx']
 base_url = 'http://18.194.232.207:8089/'
+volume_path=os.getcwd()+'/in/'
 
 def create_provider(provider_name):
   provider = Provider(name=provider_name)
@@ -211,7 +212,8 @@ def getBill(id):
 
 @app.route('/rates', methods=['GET' , 'POST'])
 def rates():
-  global filename, full_path, allowed_ext
+  global filename, volume_path, allowed_ext, full_path
+  full_path = ''
   if request.method=='POST':
     try:
       filename=request.form['file']
@@ -221,7 +223,7 @@ def rates():
     except:
       return "No file name was given. Please mention wanted file's name inside the form."
     finally:
-      full_path=os.getcwd()+'/in/'+filename
+      full_path=volume_path+filename
     try:
       book = xlrd.open_workbook(full_path, on_demand=True)
     except:
@@ -249,6 +251,8 @@ def rates():
     del book
     return Response('Done')
   elif request.method=='GET':
+    if full_path is None or full_path == '':
+      return Response('There are no available files', status=404)
     try:
       return send_file(filename_or_fp=full_path,mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',cache_timeout=0,as_attachment=True)
     except FileNotFoundError as e:
