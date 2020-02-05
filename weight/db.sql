@@ -66,7 +66,7 @@ CREATE TABLE `Transactions` (
 
 LOCK TABLES `Transactions` WRITE;
 /*!40000 ALTER TABLE `Transactions` DISABLE KEYS */;
-INSERT INTO `Transactions` VALUES (35,'in','Truck1','2020-02-03 11:27:32','2020-02-04 11:27:32','200'),(36,'In','Truck1','1998-07-09 12:34:23','1999-02-04 11:27:32','200');
+INSERT INTO `Transactions` VALUES (35,'in','Truck1','2020-02-03 11:27:32','2020-02-04 11:27:32' , 56),(36,'In','Truck1','1998-07-09 12:34:23','1999-02-04 11:27:32',89);
 /*!40000 ALTER TABLE `Transactions` ENABLE KEYS */;
 UNLOCK TABLES;
 
