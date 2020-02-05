@@ -66,6 +66,21 @@ def test_weight_route( path, expected):
     if res != expected_res:
         status = 1
 
+def test_item_route( path, expected):
+    global url
+    global status
+    res =''
+    expected_res = ''
+    try:
+        res = requests.get(url + path)
+        res = json.dumps(res.json())
+        expected_res = json.dumps(expected)
+    except Exception as e:
+        status = 1
+
+    if res != expected_res:
+        status = 1
+
     
 def main():
     
@@ -76,7 +91,7 @@ def main():
     # test__get_routes(url+"/session/", "")
 
      # testing item route
-    # test__get_routes(url+"/item/truck1", """id":"truck1","sessions":[35],"tara":92""")
+    test_item_route('/item/truck1' ,{"id":"truck1","sessions":[35],"tara":92})
     
 
     # # testing get weight route
