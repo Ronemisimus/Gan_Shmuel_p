@@ -23,9 +23,9 @@ weight_team = {
 weight_team_lead = "nati-elmaliach"
 
 providers_team = {
-    "M-Wittner" : "",
+    "M-Wittner" : "Matan.wittner@gmail.com",
     "RonBenMoshe" : "RonBenMoshe@gmail.com",
-    "Neta182" : ""
+    "Neta182" : "Netaba@mta.ac.il"
 }
 
 providers_team_lead = "RonBenMoshe"
