@@ -101,12 +101,16 @@ def test_weightafterPost_route( path, expected):
     res =''
     expected_res = ''
     try:
+        print("made it to getweight1")
         res = str(requests.get(url + path))
+        print("made it to getweight2")
         expected_res = expected
+        print("made it to getweight3")
     except Exception as e:
         status = 1
 
     if expected_res in res:
+        print("not equal!")
         status = 1
 
     
