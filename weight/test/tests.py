@@ -105,12 +105,19 @@ def test_get_routes(path , expected):
     expected_res = ''
 
     try:
+        print("res equal")
         res = requests.get(url + path)
-        res = json.dumps(res.json())
-        expected_res = json.dumps(expected)
         print(res)
+        print("res after json.dumps")
+        res = json.dumps(res.json())
+        print(res)
+        print("expected results")
+        expected_res = json.dumps(expected)
         print(expected_res)
     except Exception as e:
+        print("exception")
+        print(res)
+        print(expected_res)
         status = 1
 
     if res != expected_res:
