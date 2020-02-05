@@ -77,18 +77,6 @@ def unknown():
 
 @app.route('/session/<id>' , methods=["GET"])
 def session(id):
-    # method get session id and return json in format:
-    # [{
-    # 	"id": "<id>",
-    # 	"truckID": "<truck id>",
-    # 	"items":
-    #  [{
-    # 		"produce": "<type of produce>",
-    # 		"bruto": "<weight bruto>",
-    # 		"neto": "<weight_neto| null>"
-    # 	}]
-    # }]
-    # get table [ Produse | Bruto | Neto | Status | Truck ]
     query = """ SELECT
             t.Produce,
             (SUM(t.WeightProduce) + SUM(c.Weight)) AS bruto,
