@@ -106,14 +106,14 @@ def session(id):
     if len(data) == 0 :
         return Response(status = "404")
     else :
-        json = '[{"id": "' + str(id) + '","truckID": "' + str(data[0][4]) + '","items": ['
+        json = '{"id": "' + str(id) + '","truckID": "' + str(data[0][4]) + '","items": ['
         for tuple in data:
             if tuple[3] != "out":
                 json += '{' +'"produce": "{}", "bruto" : "{}", "neto": "{}"'.format(tuple[0],tuple[1], "null")+ '},'
             else:
                 json += '{' +'"produce": "{}", "bruto" : "{}", "neto": "{}"'.format(tuple[0],tuple[1], tuple[2])+ '},'
-        json  = json[:-1] +  ']}]' 
-    return json
+        json  = json[:-1] +  ']}' 
+    return Response(json , mimetype='application/json')
 
 
 #Convert yyyymmsddhhmmss to datetime object
