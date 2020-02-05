@@ -105,6 +105,7 @@ def gitWebHook():
 			os.system('rm -rf {}{} && cp -R {}/ {}{}'.format(STAGE_DIR, branch, compose_path, STAGE_DIR, branch))
 		else:
 			print('Tests failed!\nThis build is not going to staging.', file=sys.stderr)
+			print(test_output, file=sys.stderr)
 			os.chdir(main_folder)
 
 	if branch == 'master':
@@ -160,6 +161,7 @@ def gitWebHook():
 				os.system('rm -rf {}{} && cp -R {}/ {}{}'.format(PRODUCTION_DIR, app_name, path, PRODUCTION_DIR, app_name))
 			else:
 				print('Tests failed!\nThis build is not going to production.', file=sys.stderr)
+				print(test_output, file=sys.stderr)
 				os.chdir(main_folder)
 				continue
 	return Response(status=200)
