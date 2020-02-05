@@ -251,29 +251,42 @@ def weightpost():
 	currtime = ((datetime.utcnow() + timedelta(hours=2)).strftime("%Y-%m-%d %H:%M:%S"))
 	direction = request.args.get('direction')
 	truckID = request.args.get('truck')
-	containers = request.args.get('containers').split(",") #type/produce,type/produce
+	containers = request.args.get('containers').split("+") #type:produce+type:produce
 	weight = request.args.get('weight')
 	force = request.args.get('Force')
 	if direction == "in":
 		doesexist = dbQuery("SELECT ID FROM Transactions WHERE Status = 'in' AND TruckID = '%s'"%(truckID),False)
 		if len(doesexist) > 0:
 			if force == "on":
-				transaction = dbQuery("UPDATE Transactions SET TimeIn = '%s', LastWeight = '%s' WHERE ID = '%s'"%(str(currtime),weight,doesexist[0][0]),True)[0][0]
+				transaction = doesexist[0][0]
+				dbQuery("UPDATE Transactions SET TimeIn = '%s', LastWeight = '%s' WHERE ID = '%s'"%(str(currtime),weight,transaction),True)[0][0]
+				dbQuery("DELETE FROM TruckContainers WHERE TransactionID = '%s'"%transaction,True)
 			else:
 				return Response(status=400)
 		else:
 			transaction = dbQuery("INSERT INTO Transactions (Status, TimeIn, TruckID, LastWeight) VALUES ('in','%s','%s','%s')"%(str(currtime),truckID,weight),True)
 		if containers != "":
 			for container in containers:
-				contStrings = container.split("/")
+				contStrings = container.split(":")
 				dbQuery("INSERT INTO TruckContainers (TransactionID, ContainerID, Produce) VALUES ('%s','%s','%s')"%(transaction,contStrings[0],contStrings[1]),True)
 	else:
-		transaction = dbQuery("SELECT ID, LastWeight FROM Transactions WHERE Status = 'in' AND TruckID = '%s'"%(truckID),False)[0]
-		TransactionID = transaction[0]
+		transaction = dbQuery("SELECT ID, LastWeight FROM Transactions WHERE Status = 'in' AND TruckID = '%s'"%(truckID),False)
 		if direction == "out":
-			dbQuery("UPDATE Transactions SET Status = 'Out', LastWeight = '%s', TimeOut = '%s' WHERE ID = '%s'"%(weight,str(currtime),TransactionID), True)
+			if len(transaction) > 0:
+				TransactionID = transaction[0][0]
+				dbQuery("UPDATE Transactions SET Status = 'Out', LastWeight = '%s', TimeOut = '%s' WHERE ID = '%s'"%(weight,str(currtime),TransactionID), True)
+			elif force == "on":
+				TransactionID = dbQuery("SELECT ID, LastWeight FROM Transactions WHERE Status = 'out' AND TruckID = '%s' ORDER BY TimeOut DESC"%(truckID),False)[0][0]
+				dbQuery("UPDATE Transactions SET LastWeight = '%s', TimeOut = '%s' WHERE ID = '%s'"%(weight, str(currtime), TransactionID), True)
+				return Response(status=200)
+			else:
+				return Response(status=400)
 		else:
-			dbQuery("UPDATE Transactions SET LastWeight = '%s' WHERE ID = '%s'"%(weight,TransactionID), True)
+			if len(transaction) > 0:
+				TransactionID = transaction[0][0]
+				dbQuery("UPDATE Transactions SET LastWeight = '%s' WHERE ID = '%s'"%(weight,TransactionID), True)
+			else:
+				return Response(status=400)
 		KnownContainersQ = dbQuery('''SELECT t.ContainerID, t.Produce
 		FROM
 			weightDB.TruckContainers t
@@ -283,13 +296,13 @@ def weightpost():
 
 		KnownContainers = []
 		for container in KnownContainersQ:
-			KnownContainers.append(container[0]+"/"+container[1])
+			KnownContainers.append(container[0]+":"+container[1])
 
 		GivenContainers = []
 		for container in containers:
 			GivenContainers.append(container)
 
-		missingContainerDetails = list((Counter(KnownContainers) - Counter(GivenContainers)).elements())[0].split("/")
+		missingContainerDetails = list((Counter(KnownContainers) - Counter(GivenContainers)).elements())[0].split(":")
 		missingContainer = dbQuery('''SELECT t.id, c.Weight AS containerWeight
 		FROM
 			weightDB.TruckContainers t
@@ -300,7 +313,7 @@ def weightpost():
 			AND t.ContainerID = "%s"
 			AND t.Produce = "%s"
 			AND t.WeightProduce IS NULL'''%(TransactionID,missingContainerDetails[0],missingContainerDetails[1]),False)[0]
-		weightDifference = str(int(transaction[1]) - int(weight) - int(missingContainer[1]))
+		weightDifference = str(int(transaction[0][1]) - int(weight) - int(missingContainer[1]))
 		dbQuery("UPDATE TruckContainers SET WeightProduce = '%s' WHERE ID = '%s'"%(weightDifference,missingContainer[0]), True)
 	return redirect(url_for('input'))
 
