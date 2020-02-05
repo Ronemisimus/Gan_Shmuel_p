@@ -6,7 +6,8 @@ from datetime import datetime
 def validate(status, content, expected):
     code = 0
     log_info = ""
-    if status >= 500 or status <= 599 :
+    if 500 <= status <= 599 :
+        print("code is 500")
         log_info = "Status:  {}\n Content:\n{} \n Fail.\n".format(status, content)
         code = 1 
     else:
@@ -23,9 +24,9 @@ def validate(status, content, expected):
 
 
 
-def test__get_routes(route, expected ):
+def test__get_routes(route, expected):
     res = requests.get(route)
-    log , code  = validate(res.status_code, res.content, expected)
+    log , code  = validate(int(res.status_code), str(res.content), expected)
     with open("log.log", 'a+') as f:
         f.write("\n\n" + str(datetime.now()) + "\n\n")
         f.write("\nRoute:\t" + route + "\n\n" + log + "\n")
@@ -40,7 +41,7 @@ def test__post_routes():
 
 
 def main():
-    test__get_routes(url+"/weight?from=10000303000000&to=30000303000000&f=in",'{"35":{"bruto":"178","containers":"C1,C2","direction":"in","neto":"92","produces":"Apples,Oranges"},"36":{"bruto":"125","containers":"C1","direction":"In","neto":"12","produces":"Test,Tomato"}}')
+    # test__get_routes(url+"/weight?from=10000303000000&to=30000303000000&f=in",'{')
     test__get_routes(url+"/weight?from=10000303000000&to=30000303000000",'{"35":{"bruto":"178","containers":"C1,C2","direction":"in","neto":"92","produces":"Apples,Oranges"},"36":{"bruto":"125","containers":"C1","direction":"In","neto":"12","produces":"Test,Tomato"}}')
 
 
