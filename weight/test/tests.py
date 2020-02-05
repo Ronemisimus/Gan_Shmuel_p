@@ -3,11 +3,12 @@ import os
 from datetime import datetime
 
 
+
+# This is the repo
 def validate(status, content, expected):
     code = 0
     log_info = ""
     if 500 <= status <= 599 :
-        print("code is 500")
         log_info = "Status:  {}\n Content:\n{} \n Fail.\n".format(status, content)
         code = 1 
     else:
@@ -20,28 +21,21 @@ def validate(status, content, expected):
 
 
 
-
-
-
-
+# Test Get request
 def test__get_routes(route, expected):
     res = requests.get(route)
     log , code  = validate(int(res.status_code), str(res.content), expected)
-    with open("log.log", 'a+') as f:
-        f.write("\n\n" + str(datetime.now()) + "\n\n")
-        f.write("\nRoute:\t" + route + "\n\n" + log + "\n")
     if code == 1:
-        print(1)
+        print(log)
         exit()
 
+
+# Test Post request
 def test__post_routes(route, expected):
     res = requests.post(route)
     log , code  = validate(int(res.status_code), str(res.content), expected)
-    with open("log.log", 'a+') as f:
-        f.write("\n\n" + str(datetime.now()) + "\n\n")
-        f.write("\nRoute:\t" + route + "\n\n" + log + "\n")
     if code == 1:
-        print(1)
+        print(log)
         exit()
 
 
@@ -90,7 +84,6 @@ def main():
     print(0)
 
 url = "http://localhost:{}".format(os.environ['PORT'])
-# url = "http://18.194.232.207:8089"
 
 
 main()
