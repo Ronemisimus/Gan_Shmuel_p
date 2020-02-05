@@ -61,7 +61,7 @@ def test_weight_route( path, expected):
         status = 1
     else:
         expected_res = json.dumps(expected)
-        status = not (expected_res == res)
+        status = 0 if expected_res == res else 1
     
 def main():
     
