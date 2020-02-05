@@ -6,6 +6,8 @@ from datetime import datetime
 
 # This is the repo
 def validate(status, content, expected):
+    print(content)
+    print(expected)
     code = 0
     log_info = ""
     if 500 <= status <= 599 :
@@ -81,8 +83,8 @@ def main():
 
 
     #testing batch-file route
-    test__post_routes(url+"/batch-weight?filename=containers3.json", "b'OK inserted to db'")
-    test__post_routes(url+"/batch-weight?filename=containers3.json'", "b'file not found or it already in database'")
+    test__post_routes(url+"/batch-weight?filename=containers3.json", "OK")
+    test__post_routes(url+"/batch-weight?filename=containers3.json'", "database")
 
     print(0)
 
