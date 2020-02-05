@@ -5,7 +5,10 @@ from app.models import Truck, Provider, Rate
 from datetime import datetime, timezone
 import xlrd, os, sys
 
-last_opend_file=[ ]
+last_opend_file=''
+allowed_ext = ['csv', 'xls', 'xlsx']
+data = []
+rates_data = []
 
 def create_provider(provider_name):
   provider = Provider(name=provider_name)
@@ -220,49 +223,49 @@ def getBill(id):
 
 @app.route('/rates', methods=['GET' , 'POST'])
 def rates():
-    if request.method=='POST':
-      try:
-        filename=request.form['file']
-      except:
-        return "No file name was given. Please mention wanted file's name inside the form."
-      finally:
-        full_path=os.getcwd()+'/in/'+filename+'.xlsx'
-        last_opend_file.extend([filename, full_path])  ## used inorder to restore the file in the GET method
-      try:
-        book = xlrd.open_workbook(full_path, on_demand=True)
-      except:
-          print ("File doesn't exists in '/in' folder.") #ToDo - insert to a logger
-          return Response(status=404)
-      else: ## Case file was opend successfuly
-        sheet = book.sheet_by_index(0) ## ToDo: change to find sheet by name
-        for i in range(1,sheet.nrows):
-          for j in range(sheet.ncols):
-            if j==0:
-              product=str(sheet.cell(i,j).value )
-            elif j==1:
-              rate = int(sheet.cell(i,j).value )
-            elif j==2:
-              scope = str(sheet.cell(i,j).value )
-          new_rate_candidate=Rate.query.filter_by(product_id=product, scope=scope).first()
-          if new_rate_candidate is None:
-            new_rate = Rate(product_id=product,rate=rate,scope=scope)
-            try:
-              db.session.add(new_rate)
-              db.session.commit()
-            except:
-              print ("Coldn't insert data to billdb.table 'Rates'")
-              return Response(status=500)
-          else:
-            new_rate_candidate.rate=rate
-            db.session.commit()
-
-        book.release_resources()
-        return 'Done'
-
-    elif request.method=='GET':
-      try:
-        return send_file(last_opend_file[-1], mimetype='application/octet-stream',
-        attachment_filename=last_opend_file[-2]+'.xlsx',
-        as_attachment=True)
-      except FileNotFoundError:
-        return Response(status=404)   
+  global last_opend_file
+  global allowed_ext
+  global data
+  global rates_data
+  if request.method=='POST':
+    try:
+      filename=request.form['file']
+      file_ext = filename.split('.')[-1]
+      if file_ext not in allowed_ext:
+        return Response('File type is not allowed ({})'.format(file_ext), status=400)
+    except:
+      return "No file name was given. Please mention wanted file's name inside the form."
+    finally:
+      full_path=os.getcwd()+'/in/'+filename
+      last_opend_file = full_path  ## used inorder to restore the file in the GET method
+    try:
+      book = xlrd.open_workbook(full_path, on_demand=True)
+    except:
+        return Response("File ({}) not found in folder".format(filename), status=404)
+    else: ## Case file was opend successfuly
+      sheet = book.sheet_by_index(0) ## ToDo: change to find sheet by name
+      for rownum in range(1,sheet.nrows):
+        for col in range(0, sheet.ncols):
+          col_name = sheet.col_values(col)[0].lower()
+          value = sheet.row_values(rownum)[col]  if col_name != 'product' else str(sheet.row_values(rownum)[col]).split('.')[0]
+        new_rate = Rate(product_id=temp_obj['product'], scope=temp_obj['scope'], rate=temp_obj['rate'])
+        exist_rate = Rate.query.filter_by(product_id=new_rate.product_id, scope=new_rate.scope).first()
+        if exist_rate is None:
+        db.session.add(new_rate)
+        else:
+          exist_rate.rate = new_rate.rate
+        try:
+          db.session.commit()
+        except Exception as e:
+          msg = 'Could not insert new rate({})\n{}\n'.format(temp_obj, e)
+          return Response(msg, status=400)
+      book.release_resources()
+      del book
+      return Response('Done')
+  elif request.method=='GET':
+    try:
+      return send_file(last_opend_file[-1], mimetype='application/octet-stream',
+      attachment_filename=last_opend_file[-2]+'.xlsx',
+      as_attachment=True)
+    except FileNotFoundError:
+      return Response(status=404)   
