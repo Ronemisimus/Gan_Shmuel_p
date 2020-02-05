@@ -8,6 +8,7 @@ status = 0
 url = "http://localhost:{}".format(os.environ['PORT'])
 
 
+
 def test_health():
     global url
     global status
@@ -91,9 +92,15 @@ def test_batch_weight(path, expected):
         status = 1
 
 
-def test_unknown(path , expected):
+def test_get_routes(path , expected):
+     
     global url
     global status
+    global test
+
+    if test:
+        url = 'http://18.194.232.207:8088'
+    
     res = ''
     expected_res = ''
 
@@ -107,9 +114,12 @@ def test_unknown(path , expected):
     if res != expected_res:
         status = 1
 
+
+test = False
 def main():
     test_health()
-    test_unknown('/unknown' ,{"7":{"ContainerID":"C1","Produce":"Test","TransactionID":"36"}} )
+    test_get_routes('/unknown' ,{"7":{"ContainerID":"C1","Produce":"Test","TransactionID":"36"}})
+    test_get_routes('/item/Truck1?from=20200202112732&to=20211231011500' ,{"id":"Truck1","sessions":[35],"tara":92})
 
     print(status)
 
