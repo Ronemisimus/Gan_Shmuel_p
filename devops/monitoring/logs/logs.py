@@ -71,7 +71,7 @@ def commits_report(data):
 def tests_report(data):
     messages = ""
 
-    messages += "Tests for {}: {}".format(data["tests"]["app_name"], data["tests"]["test_result"] if data["tests"]["test_result"] != 0 else "All tests were successful!")
+    messages += "Tests for {} branch: {}".format(data["tests"]["app_name"], data["tests"]["test_result"] if data["tests"]["test_result"] != "0" else "All tests were successful!")
 
     entry = "Test Report for {}'s Latest Push".format(data['pusher']['name'])
 
@@ -103,7 +103,7 @@ def log():
     entry = "Tests and Commits Reports for {}'s Latest Push".format(data['pusher']['name'])
 
     send_email(entry, ["test_log.txt", "committers_log.txt"], recipients)    
-#
+
     return Response("200")
 
 @app.route('/health', methods=['GET'])
