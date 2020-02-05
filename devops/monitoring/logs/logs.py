@@ -76,7 +76,7 @@ def tests_report(data):
     for k, v in data["tests"].items(): 
         messages += "{} {}\n".format(k, "was successful." if v == "success" else "has failed.")
 
-    entry = "Test Report for {}'s Latest Push".format(data['pusher']['name'])
+    entry = "Dummy Test Report for {}'s Latest Push".format(data['pusher']['name'])
 
     log_entry("\n" + entry + "\n\n" + messages, "test_log.txt")
 
