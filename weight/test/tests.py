@@ -66,16 +66,29 @@ def test_weight_route( path, expected):
     if res != expected_res:
         status = 1
 
+
+def test_unknown(path , expected):
+    global url
+    global status
+    res = ''
+    expected_res = ''
+
+    try:
+        res = requests.get(url + path)
+        res = json.dumps(res.json())
+        expected_res = json.dumps(expected)
+    except Exception as e:
+        status = 1
     
+    if res != expected_res:
+        status = 1
+
 def main():
     
     #testing session  route
     test_weight_route('/session/35' ,{"id": "35","truckID": "Truck1","items": [{"produce": "Oranges", "bruto" : "46", "neto": "null"},{"produce": "Apples", "bruto" : "76", "neto": "null"}]} )
-    # test__get_routes(url+"/session/35" ,'{"id": "35","truckID": "Truck1","items": [{"produce": "Oranges", "bruto" : "46", "neto": "null"},{"produce": "Apples", "bruto" : "76", "neto": "null"}]}')
-    # test__get_routes(url+"/session/36" ,"""{"id": "36","truckID": "Truck1","items": [{"produce": "Tomato", "bruto" : "24", "neto": "null"},{"produce": "Test", "bruto" : "None", "neto": "null"}]}""")
-    # test__get_routes(url+"/session/", "")
 
-     # testing item route
+    # testing item route
     # test__get_routes(url+"/item/truck1", """id":"truck1","sessions":[35],"tara":92""")
     
 
@@ -102,12 +115,10 @@ def main():
   
 
     # #testing /health route
-    #test__get_routes(url+"/health", "OK")
     test_health()
+
+    # testing /unknown route
+    test_unknown("/unknown",{"7":{"ContainerID":"C1","Produce":"Test","TransactionID":"36"},"8":{"ContainerID":"C1","Produce":"Bananas","TransactionID":"37"},"9":{"ContainerID":"C2","Produce":"Peaches","TransactionID":"37"}})
     print(status)
-
-    # #testing /unknown route
-    #test__get_routes(url+"/unknown", "b'7  '")
-
 
 main()
