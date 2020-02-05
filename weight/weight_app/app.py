@@ -67,9 +67,9 @@ def unknown():
     # Returns a list of all recorded containers that have unknown weight:
     # "id1" "id2"
     unknown_containers = ""
-    data = dbQuery("SELECT * FROM Containers WHERE Weight is NULL", isInsertOrUpdate=False)
+    data = dbQuery("SELECT * FROM TruckContainers WHERE WeightProduce is NULL", isInsert=False)
     for tuple in data:
-        unknown_containers = unknown_containers + tuple[0] + '  '
+        unknown_containers = unknown_containers + str(tuple[0]) + '  '
     return unknown_containers
 
 @app.route('/session/<id>' , methods=["GET"])
