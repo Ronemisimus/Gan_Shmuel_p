@@ -12,9 +12,9 @@ services:
       - /ci-server/stage:/ci-server/stage
       - /ci-server/production:/ci-server/production
 
-  committer-report:
-    build: ./monitoring/committer_report
-    image: monitoring/committer_report
+  logs:
+    build: ./monitoring/logs
+    image: monitoring/logs
     ports:
       - "8084:8084"
 
