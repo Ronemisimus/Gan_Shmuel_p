@@ -64,6 +64,13 @@ def commits_report(data):
 
 def tests_report(data):
     messages = ""
+
+    data["tests"] = { 
+        "test1" : "success",
+   	    "test2" : "failure",
+   	    "test3" : "success",
+        "test4" : "success"
+    }
     
     for k, v in data["tests"].items(): 
         messages += "{} {}\n".format(k, "was successful." if v == "success" else "has failed.")
