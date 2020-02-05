@@ -90,14 +90,14 @@ def test():
     pusher = "{}".format(data['pusher']['name'])
     recipients = []
     if pusher in weight_group:
-        # recipients = ["natielmaliach3197@gmail.com", pushers_email]
-        recipients = ["eigorek@gmail.com"]
+        recipients = ["natielmaliach3197@gmail.com", pushers_email]
+        # recipients = ["eigorek@gmail.com"]
     elif pusher in providers_group:
-        # recipients = ["ronmoshe333@gmail.com", pushers_email]
-        recipients = ["eigorek@gmail.com"]
+        recipients = ["ronmoshe333@gmail.com", pushers_email]
+        # recipients = ["eigorek@gmail.com"]
     elif pusher in devops_group:
-        # recipients = ["chrispushkin@gmail.com", pushers_email]
-        recipients = ["eigorek@gmail.com"]
+        recipients = ["chrispushkin@gmail.com", pushers_email]
+        # recipients = ["eigorek@gmail.com"]
 
     entry = "Tests and Commits Reports for {}'s Latest Push".format(data['pusher']['name'])
 
