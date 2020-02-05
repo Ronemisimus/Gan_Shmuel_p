@@ -74,17 +74,14 @@ def main():
     # # test__post_routes(url+"/weight?direction=out&truck=DebugTruck&containers=&weight=150","")
     # # timeOut=datetime.now().strftime("%Y%m%d%H%M%S")
 
-
-   
-
     # # Testing if Transaction was entered successfully
     # #test__get_routes(url+"/weight?from=%s&to=%s&filter=out"%(str(timeIn),str(timeOut)),'{"bruto":"390","containers":"C1,C2","direction":"Out","neto":"210","produces":"Bananas,Peaches"}')
 
 
 
     #testing batch-file route
-    test__post_routes(url+"/batch-weight?filename=containers3.json", "OK")
-    test__post_routes(url+"/batch-weight?filename=containers3.json'", "database")
+    # test__post_routes(url+"/batch-weight?filename=containers3.json", "OK")
+    # test__post_routes(url+"/batch-weight?filename=containers3.json'", "database")
 
     print(0)
 
