@@ -8,6 +8,7 @@ import xlrd, os, sys
 allowed_ext = ['csv', 'xls', 'xlsx']
 base_url = 'http://18.194.232.207:8089/'
 volume_path=os.getcwd()+'/in/'
+full_path=''
 
 def create_provider(provider_name):
   provider = Provider(name=provider_name)
@@ -40,7 +41,7 @@ def provider():
   provider_name=request.form['provider']
   provider_res=create_provider(provider_name)
   if provider_res is None:
-    return Response(json.dumps("Provider {} is already exists!".format(provider_name)),mimetype='application/json')
+    return Response(json.dumps("Provider {} is already exists!".format(provider_name)),mimetype='application/json',status=400)
   
   res={'id':provider_res.id, 'name':provider_res.name}
   return Response(json.dumps(res),mimetype='application/json')
@@ -51,13 +52,13 @@ def updateProvider(provider_id):
   if Provider.query.filter_by(name=provider_new_name).first() is None: 
     search_provider_id=Provider.query.filter_by(id=provider_id).first()
     if search_provider_id is None:
-      return Response("Provider {} is not exist! ".format(provider_id),mimetype='text/plain', status=404)
+      return Response("Provider {} is not exist! ".format(provider_id),mimetype='text/plain', status=400)
     search_provider_id.name=provider_new_name
     db.session.commit()
     res = {'id': search_provider_id.id, 'name': provider_new_name}
     return Response(json.dumps(res),mimetype='application/json')
   else:
-    return Response(json.dumps("Provider name {} already exist ,cant accpet new name!".format(provider_new_name)),mimetype='application/json')
+    return Response(json.dumps("Provider name {} already exist ,cant accpet new name!".format(provider_new_name)),mimetype='application/json',status=400)
   
     
 @app.route('/truck', methods=['POST'])
@@ -214,7 +215,6 @@ def getBill(id):
 @app.route('/rates', methods=['GET' , 'POST'])
 def rates():
   global filename, volume_path, allowed_ext, full_path
-  full_path = ''
   if request.method=='POST':
     rate_list = []
     try:
