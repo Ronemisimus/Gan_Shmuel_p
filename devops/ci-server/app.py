@@ -78,7 +78,7 @@ def gitWebHook():
 		# Tests go here
 		print('Running tests...')
 		os.environ['TEST_URL'] = 'http://localhost'
-		sleep(10)
+		sleep(15)
 		
 		test_output = 'Could not open test file.'
 		try:
@@ -133,7 +133,7 @@ def gitWebHook():
 			# Tests go here
 			print('Running tests...', file=sys.stderr)
 			os.environ['TEST_URL'] = 'http://localhost'
-			sleep(10)
+			sleep(15)
 
 			test_output = 'Could not open test file.'
 			try:
