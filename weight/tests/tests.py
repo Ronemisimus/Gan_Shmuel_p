@@ -62,16 +62,22 @@ def validate(status, content):
     log_info = ""
     if status == 200:
         log_info = "Status:  {}\n Content:\n{} \nYeah ;) \n".format(status, content)
-    # elif status == 500:
-    #     log_info = "Status:  {}\n Content:\n{} \nIt's look like can't connect to db\n".format(status, content)
-    #     print("1")
-    # elif status == 404:
-    #     log_info = "Status:  {}\n Content:\n{} \nInvalid url \n".format(status, content)
+        validate_response(content)
+        print("0")
+    elif status == 404:
+        log_info = "Status:  {}\n Content:\n{} \nInvalid url \n".format(status, content)
+        print("0")
     else:
         log_info = "Status:  {}\n Content:\n{} \n Fail.\n".format(status, content)
         print("1")
     return log_info
 
+
+def validate_response(content){
+    #check if content is valid json file
+
+    print("0")
+}
 
 url = "http://localhost:{}".format(os.environ['PORT'])
 # url ="http://18.194.232.207:{}".format(os.environ['PORT'])
@@ -85,7 +91,7 @@ get_routes  = [ "/" , "/health" , "/weight", "/batch-weight", "/unknown", "/item
 
 
 post_routes = [ "/weight", "/batch-weight" ]
-validations = {"/":[""], "/health" : [""], "/weight": ["from=t1&to=t2&filter=f", "from=aaa&to=bbb"]}
+validations = {"/":[""], "/health" : [""], "/weight": ["from=t1&to=t2&filter=f", "?from=aaa&to=bbb"]}
 
 for route, test in validations.items():
     for item in test:
