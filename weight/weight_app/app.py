@@ -213,13 +213,13 @@ def weight():
 	if request.args.get("from"):
 		start = parse_time(request.args.get('from'))
 	else:
-		start = datetime.now().strftime("%Y-%m-%d 00:00:00")
+		start = ((datetime.utcnow() + timedelta(hours=2)).strftime("%Y-%m-%d 00:00:00"))
 	if request.args.get("to"):
 		end = parse_time(request.args.get('to'))
 	else:
-		end = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-	if request.args.get("f"):
-		filt=("("+request.args.get("f")+")").replace("(","('").replace(",","','").replace(")","')")
+		end = ((datetime.utcnow() + timedelta(hours=2)).strftime("%Y-%m-%d %H:%M:%S"))
+	if request.args.get("filter"):
+		filt=("("+request.args.get("filter")+")").replace("(","('").replace(",","','").replace(")","')")
 	else:
 		filt = "('in','out','none')"
 
