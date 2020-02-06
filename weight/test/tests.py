@@ -46,7 +46,7 @@ def test_weightPost_route( path, expected, testname = 0):
         print('test name: {}'.format(testname))
         status = 1
 
-def test_batch_weight(path, expected):
+def test_batch_weight(path, expected , testname = 0):
     global url
     global status
     res =''
@@ -59,6 +59,7 @@ def test_batch_weight(path, expected):
         status = 1
 
     if res != expected_res:
+        print('test name: {}'.format(testname))
         print(str(type(res))+ " "+ str(res))
         print(str(type(expected_res))+ " "+ str(expected_res))
         status = 1
