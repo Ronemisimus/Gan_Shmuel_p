@@ -1,0 +1,87 @@
+[Matan]-[02/04/20 18:56:37] - DB connection failed:
+ HTTPConnectionPool(host='localhost', port=8086): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f88c987f518>: Failed to establish a new connection: [Errno 111] Connection refused',))
+
+[Matan]-[02/04/20 18:56:37] - Insert New truck failed:
+ HTTPConnectionPool(host='localhost', port=8086): Max retries exceeded with url: /truck (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f88c987fcc0>: Failed to establish a new connection: [Errno 111] Connection refused',))
+
+[Matan]-[02/04/20 19:06:30] - DB connection failed:
+ HTTPConnectionPool(host='localhost', port=8086): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f473454d550>: Failed to establish a new connection: [Errno 111] Connection refused',))
+
+[Matan]-[02/04/20 19:06:30] - Insert New truck failed:
+ HTTPConnectionPool(host='localhost', port=8086): Max retries exceeded with url: /truck (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f473454dcf8>: Failed to establish a new connection: [Errno 111] Connection refused',))
+
+[Matan]-[02/04/20 19:15:06] - Insert New truck failed:
+ Expecting value: line 1 column 1 (char 0)
+
+[Matan]-[02/04/20 19:17:06] - Insert New truck failed:
+ string indices must be integers
+
+[Matan]-[02/04/20 19:17:31] - Insert New truck failed:
+ string indices must be integers
+
+[Matan]-[02/04/20 19:18:02] - Insert New truck failed:
+ string indices must be integers
+
+[Matan]-[02/04/20 19:18:23] - Insert New truck failed:
+ string indices must be integers
+
+[Matan]-[02/04/20 19:19:29] - Insert New truck failed:
+ Expecting value: line 1 column 1 (char 0)
+
+[Matan]-[02/04/20 19:39:42] - GET truck failed:
+ name 'res_truck' is not defined
+
+[Matan]-[02/04/20 19:40:45] - GET truck failed:
+ name 'res_truck' is not defined
+
+[Matan]-[02/04/20 19:42:31] - GET truck failed:
+ name 'res_truck' is not defined
+
+[Matan]-[02/04/20 19:43:24] - Insert New truck failed:
+ Expecting value: line 1 column 1 (char 0)
+
+[Matan]-[02/04/20 19:43:24] - GET truck failed:
+ Expecting value: line 1 column 1 (char 0)
+
+[Matan]-[02/04/20 19:43:36] - GET truck failed:
+ Expecting value: line 1 column 1 (char 0)
+
+[Matan]-[02/04/20 19:45:14] - Insert New truck failed:
+ Expecting value: line 1 column 1 (char 0)
+
+[Matan]-[02/04/20 19:45:14] - Update truck failed:
+ Expecting value: line 1 column 1 (char 0)
+
+[Matan]-[02/04/20 19:45:14] - GET truck failed:
+ Expecting value: line 1 column 1 (char 0)
+
+[Matan]-[02/04/20 19:46:16] - GET truck failed:
+ Expecting value: line 1 column 1 (char 0)
+
+[Matan]-[02/04/20 19:49:38] - GET truck failed:
+ Expecting value: line 1 column 1 (char 0)
+
+[Matan]-[02/04/20 19:52:11] - GET truck failed:
+ Expecting value: line 1 column 1 (char 0)
+
+[Matan]-[02/04/20 19:55:57] - GET truck failed:
+ Expecting value: line 1 column 1 (char 0)
+
+[Matan]-[02/04/20 19:58:09] - Insert New truck failed:
+ Expecting value: line 1 column 1 (char 0)
+[Matan]-[02/04/20 20:00:53] - GET truck failed:
+ Expecting value: line 1 column 1 (char 0)
+[Matan]-[02/04/20 20:01:30] - GET truck failed:
+ Expecting value: line 1 column 1 (char 0)
+[Matan]-[02/04/20 20:02:33] - GET truck failed:
+ Expecting value: line 1 column 1 (char 0)
+[Matan]-[02/04/20 20:03:05] - GET truck failed:
+ Expecting value: line 1 column 1 (char 0)
+[Matan]-[02/04/20 20:03:55] - GET truck failed:
+ Expecting value: line 1 column 1 (char 0)
+[Matan]-[02/04/20 20:04:28] - GET truck failed:
+ Expecting value: line 1 column 1 (char 0)
+[Matan]-[02/04/20 20:04:50] - GET truck failed:
+ Expecting value: line 1 column 1 (char 0)
+[Matan]-[02/04/20 20:05:32] - GET truck failed:
+ request() got an unexpected keyword argument 'args'
