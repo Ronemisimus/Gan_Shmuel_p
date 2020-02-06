@@ -6,10 +6,9 @@ from mysql.connector import Error
 from insertions import read_json_file , read_csv_file
 import json
 import os
-from collections import Counter 
+from collections import Counter
 import time
-import sys
-
+import sys 
 app = Flask(__name__)
 
 def dbQuery(sql, isInsertOrUpdate=None):
@@ -31,23 +30,20 @@ def dbQuery(sql, isInsertOrUpdate=None):
 
 # Todo: See how we can instantiate the DB only once , and pass it to app.py
 def check_db_status(host='db',database='weightDB',user='user',password='alpine'):
-    mydb =  mysql.connector.connect(
-        password='alpine', 
-        user='root', 
-        host='db', 
-        port='3306', 
-        database='weightDB' ,  
-        auth_plugin='mysql_native_password')
+    mydb = mysql.connector.connect(
+    host='db',
+    database='weightDB',
+    user='root',
+    password='alpine',
+    port='3306'
+    )
     mycursor = mydb.cursor()
-    mycursor.execute("show tables")
-    res = str(mycursor.fetchall())
-    print(res , file=sys.stderr)
+    res = mycursor.execute("SHOW TABLES")
 
-    if not res:
+    if not len(res):
         return False
     else:
         return True
-
 
 
 @app.route("/favicon.ico", methods=["GET"])
@@ -59,13 +55,10 @@ def favicon():
 @app.route("/")
 @app.route("/health")
 def health():
-
-    while not check_db_status():
-        print("Trying to connect" , file=sys.stderr)
-    
-    return "Mysql is up"
-
-
+    if check_db_status():
+        return "OK"
+    else:
+        return Response(status=500)
 
 @app.route('/batch-weight' , methods=["POST"])
 def batch_weight():
@@ -89,7 +82,6 @@ def batch_weight():
 def unknown():
     # Returns a list of all recorded containers that have unknown weight:
     # "id1" "id2"
-
     unknown_containers = []
     data = dbQuery("SELECT * FROM TruckContainers WHERE WeightProduce is NULL", False)
     
@@ -101,6 +93,7 @@ def unknown():
 
 @app.route('/session/<id>' , methods=["GET"])
 def session(id):
+
     query = """ SELECT
             t.Produce,
             (SUM(t.WeightProduce) + SUM(c.Weight)) AS bruto,
@@ -373,5 +366,12 @@ def weightpost():
 def input():
 	return render_template('weight_form.html')
 
+
+
 if __name__ == '__main__':
-    app.run(debug = True, host="0.0.0.0", threaded=False)
+
+    # validate database connection
+    while not check_db_status():
+        continue
+
+    app.run(debug = True, host="0.0.0.0" , threaded=False)
