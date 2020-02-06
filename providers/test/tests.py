@@ -98,15 +98,15 @@ def test_get_truck():
     is_error = not (expected_res == res)
   return
 
-  def test_get_bill():
-        global get_bill_id
-    global is_error
-    try:
-      requests.get('{}/bill/{}?from={}&to={}'.format(url,get_bill_id['id'],get_bill_id['from'],get_bill_id['to']))
-    except Exception as e:
-      is_error = True
-      log_error_msg('Trying to get bill for provider failed', e)
-    return
+def test_get_bill():
+  global get_bill_id
+  global is_error
+  try:
+    requests.get('{}/bill/{}?from={}&to={}'.format(url,get_bill_id['id'],get_bill_id['from'],get_bill_id['to']))
+  except Exception as e:
+    is_error = True
+    log_error_msg('Trying to get bill for provider failed', e)
+  return
 
 def test_rate_post():
   global is_error 
