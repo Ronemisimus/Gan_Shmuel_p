@@ -38,12 +38,15 @@ def check_db_status(host='db',database='weightDB',user='user',password='alpine')
         port='3306'
         )
         mycursor = mydb.cursor()
-        res = mycursor.execute("SHOW tables").fetchall()
+        res = mycursor.execute("SHOW tables")
 
-        if len(res) == 0:
+        try:
+            data = res.fetchall()
+        except:
             return False
         else:
-            return True
+            if len(data) != 0:
+                return True
 
 
 
