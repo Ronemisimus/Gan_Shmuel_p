@@ -53,6 +53,8 @@ def test_weightafterPost_route( path, expected):
     except Exception as e:
         status = 1
     if not expected_res in res:
+        print(str(type(res))+ " "+ str(res))
+        print(str(type(expected_res))+ " "+ str(expected_res))
         status = 1
 
 def test_batch_weight(path, expected):
@@ -124,7 +126,7 @@ def main():
     timeOut=datetime.now().strftime("%Y%m%d%H%M%S")
 
     # # # # Testing if Transaction was entered successfully
-    # test_weightafterPost_route("/weight?from=%s&to=%s&filter=out"%(str(timeIn),str(timeOut)),'{"bruto":"390","containers":"C1,C2","direction":"Out","neto":"210","produces":"Bananas,Peaches"}')
+    test_weightafterPost_route("/weight?from=%s&to=%s&filter=out"%(str(timeIn),str(timeOut)),'{"bruto":"390","containers":"C1,C2","direction":"Out","neto":"210","produces":"Bananas,Peaches"}}')
     # test_batch_weight("/batch-weight", "file not found or it already in database")
 
     print(status)
