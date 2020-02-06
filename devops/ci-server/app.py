@@ -1,4 +1,4 @@
-from flask import Flask, Response, request
+from flask import Flask, Response, request, send_from_directory
 import os
 import sys
 from dotenv import load_dotenv, find_dotenv
@@ -31,6 +31,41 @@ def killCompose(environment, app):
 	os.system('docker-compose -p {}-{} kill'.format(environment, app))
 	os.system('docker-compose -p {}-{} rm -f'.format(environment, app))
 
+@app.route('/', methods=['GET'])
+def index():
+	return send_from_directory('', 'index.html')
+
+@app.route('/log', methods=['GET'])
+def log():
+	docker_log = subprocess.check_output(['docker', 'container', 'log', ])
+
+@app.route('/containers', methods=['GET'])
+def containers():
+	docker_ps = subprocess.check_output(['docker', 'ps', '--format', '{{.ID}}|{{.Names}}|{{.RunningFor}}|{{.Status}}|{{.Ports}}']).decode('utf-8')
+	container_list = ''
+	for container in docker_ps[:-1].split('\n'):
+		container_data = container.split('|')
+		container_list += '<tr><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td></tr>'.format(container_data[0], container_data[1], container_data[2], container_data[3], container_data[4])
+
+	containers_table = '''
+		<table>
+			<tr>
+				<td>Container ID</td>
+				<td>Name</td>
+				<td>Running for</td>
+				<td>Status</td>
+				<td>Ports</td>
+			'''+container_list+'''
+		</table>
+	'''
+	response = Response(containers_table)
+	response.headers['Access-Control-Allow-Origin'] = '*'
+	return response
+
+@app.route('/health', methods=['GET'])
+def health():
+	return Response(status=200)
+
 @app.route('/payload', methods=['POST'])
 def gitWebHook():
 	data = request.get_json()
@@ -41,16 +76,6 @@ def gitWebHook():
 
 	os.system('rm -rf {}{}'.format(TESTING_DIR, branch))
 	os.system('git clone {} --single-branch -b {} {}{}'.format(REPOSITORY_URL, branch, TESTING_DIR, branch))
-
-	'''
-	# TODO: CI for CI.
-	if branch == 'devops':
-		compose_file = find('docker-compose.yml', '{}{}'.format(TESTING_DIR, branch))
-
-		os.system('docker-compose -f {} build'.format(compose_file))
-		os.system('docker-compose restart')
-		return Response(200)
-	'''
 
 	if branch == 'weight' or branch == 'provider':
 		# Finding the Dockerfile
@@ -76,9 +101,9 @@ def gitWebHook():
 		os.system('docker-compose -p {}-{} up -d'.format(environment, branch))
 		
 		# Tests go here
-		print('Running tests...')
+		print('Running tests...', file=sys.stderr)
 		os.environ['TEST_URL'] = 'http://localhost'
-		sleep(15)
+		sleep(20)
 		
 		test_output = 'Could not open test file.'
 		try:
@@ -93,7 +118,7 @@ def gitWebHook():
 		requests.post('http://localhost:8084/log', json=data)
 
 		if test_output.strip('\n') == '0':
-			# Test was successfulprint(test_output, file=sys.stderr), run the tested image in stage environment
+			# Test was successful, run the tested image in stage environment
 			# and move its source code to stage/ folder
 			print('Test succedded, going to staging.', file=sys.stderr)
 
@@ -133,7 +158,7 @@ def gitWebHook():
 			# Tests go here
 			print('Running tests...', file=sys.stderr)
 			os.environ['TEST_URL'] = 'http://localhost'
-			sleep(15)
+			sleep(20)
 
 			test_output = 'Could not open test file.'
 			try:
@@ -145,7 +170,6 @@ def gitWebHook():
 			
 			killCompose(environment, app_name)
 			data['tests'] = {'app_name': app_name, 'test_result': test_output}
-			print(data, file=sys.stderr)
 			requests.post('http://localhost:8084/log', json=data)
 
 			if test_output.strip('\n') == '0':
@@ -167,4 +191,4 @@ def gitWebHook():
 	return Response(status=200)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8085, debug=True)
+    app.run(host='0.0.0.0', port=8085, debug=True, threaded=False)
