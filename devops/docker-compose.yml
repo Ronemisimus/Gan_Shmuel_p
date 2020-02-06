@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+  ci-server:
+    build: ./ci-server
+    image: ci-server
+    ports:
+      - "8085:8085"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /ci-server/test:/ci-server/test
+      - /ci-server/stage:/ci-server/stage
+      - /ci-server/production:/ci-server/production
+    network_mode: host
+
+  logs:
+    build: ./monitoring/logs
+    image: monitoring/logs
+    ports:
+      - "8084:8084"
+
+  monitor:
+    build: ./monitoring
+    image: monitoring
+    ports:
+      - "8083:8083"
+
