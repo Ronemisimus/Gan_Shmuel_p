@@ -33,6 +33,8 @@ def test_weightPost_route( path, expected):
     global status
     res =''
     expected_res = expected
+    print(type(res) + " " + str(res))
+    print(type(expected_res) + " " + str(expected_res))
     try:
         res = str(requests.post(url + path).content)
     except Exception as e:
