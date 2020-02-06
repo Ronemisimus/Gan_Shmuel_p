@@ -53,7 +53,7 @@ def health():
             return Response(status=500)
         time.sleep(1)
     return "OK"
-    
+
 
 
 @app.route('/batch-weight' , methods=["POST"])
@@ -330,4 +330,4 @@ def input():
 	return render_template('weight_form.html')
 
 if __name__ == '__main__':
-    app.run(debug = True, host="0.0.0.0")
+    app.run(debug = True, host="0.0.0.0", threaded=False)
