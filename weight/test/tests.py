@@ -26,7 +26,7 @@ def test_weight_route( path, expected):
 
 
 
-def test_weightPost_route( path, expected):
+def test_weightPost_route( path, expected, testname = 0):
     global url
     global status
     res =''
@@ -43,6 +43,7 @@ def test_weightPost_route( path, expected):
     if not expected_res in res:
         print(expected_res)
         print(res)
+        print('test name: {}'.format(testname))
         status = 1
 
 def test_batch_weight(path, expected):
@@ -108,10 +109,10 @@ def main():
     test_get_routes('/session/35' , {"id": "35","truckID": "Truck1","items": [{"produce": "Oranges", "bruto" : "46", "neto": "null"},{"produce": "Apples", "bruto" : "76", "neto": "null"}]})
 
 
-    test_weightPost_route("/weight?direction=in&truck=DebugTruck&containers=C1%3APeaches%2BC1%3APeaches%2BC2%3ABananas&weight=390",'{"37":{"bruto":"390","truck":"DebugTruck"}}')
-    test_weightPost_route("/weight?direction=none&truck=DebugTruck&containers=C1%3APeaches%2BC2%3ABananas&weight=308",'{"37":{"bruto":"390","truck":"DebugTruck"}}')
-    test_weightPost_route("/weight?direction=none&truck=DebugTruck&containers=C2%3ABananas&weight=236",'{"37":{"bruto":"390","truck":"DebugTruck"}}')
-    test_weightPost_route("/weight?direction=out&truck=DebugTruck&containers=&weight=150",'{"37":{"bruto":"390","neto":"210","truck":"DebugTruck","truckTara":"150"}}')
+    test_weightPost_route("/weight?direction=in&truck=DebugTruck&containers=C1%3APeaches%2BC1%3APeaches%2BC2%3ABananas&weight=390",'')
+    test_weightPost_route("/weight?direction=none&truck=DebugTruck&containers=C1%3APeaches%2BC2%3ABananas&weight=308",'{"37":{"bruto":"390","truck":"DebugTruck"}}' , 1)
+    test_weightPost_route("/weight?direction=none&truck=DebugTruck&containers=C2%3ABananas&weight=236",'{"37":{"bruto":"390","truck":"DebugTruck"}}' , 2)
+    test_weightPost_route("/weight?direction=out&truck=DebugTruck&containers=&weight=150",'{"37":{"bruto":"390","neto":"210","truck":"DebugTruck","truckTara":"150"}}',3 )
 
     #test_batch_weight("/batch-weight", "file not found or it already in database")
 
