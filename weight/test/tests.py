@@ -55,6 +55,7 @@ def test_weightafterPost_route( path, expected):
     if not expected_res in res:
         print(str(type(res))+ " "+ str(res))
         print(str(type(expected_res))+ " "+ str(expected_res))
+        print(path)
         status = 1
 
 def test_batch_weight(path, expected):
