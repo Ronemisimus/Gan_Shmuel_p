@@ -117,15 +117,15 @@ def main():
     test_get_routes('/session/35' , {"id": "35","truckID": "Truck1","items": [{"produce": "Oranges", "bruto" : "46", "neto": "null"},{"produce": "Apples", "bruto" : "76", "neto": "null"}]})
 
     # #Testing Inserting Transaction with 3 containers using POST /weight
-    # timeIn=datetime.now().strftime("%Y%m%d%H%M%S")
-    # test_weightPost_route("/weight?direction=in&truck=DebugTruck&containers=C1%3APeaches%2BC1%3APeaches%2BC2%3ABananas&weight=390","<Response [200]>")
-    # test_weightPost_route("/weight?direction=none&truck=DebugTruck&containers=C1%3APeaches%2BC2%3ABananas&weight=308","<Response [200]>")
-    # test_weightPost_route("/weight?direction=none&truck=DebugTruck&containers=C2%3ABananas&weight=236","<Response [200]>")
-    # test_weightPost_route("/weight?direction=out&truck=DebugTruck&containers=&weight=150","<Response [200]>")
-    # timeOut=datetime.now().strftime("%Y%m%d%H%M%S")
+    timeIn=datetime.now().strftime("%Y%m%d%H%M%S")
+    test_weightPost_route("/weight?direction=in&truck=DebugTruck&containers=C1%3APeaches%2BC1%3APeaches%2BC2%3ABananas&weight=390","<Response [200]>")
+    test_weightPost_route("/weight?direction=none&truck=DebugTruck&containers=C1%3APeaches%2BC2%3ABananas&weight=308","<Response [200]>")
+    test_weightPost_route("/weight?direction=none&truck=DebugTruck&containers=C2%3ABananas&weight=236","<Response [200]>")
+    test_weightPost_route("/weight?direction=out&truck=DebugTruck&containers=&weight=150","<Response [200]>")
+    timeOut=datetime.now().strftime("%Y%m%d%H%M%S")
 
     # # # Testing if Transaction was entered successfully
-    # test_weightafterPost_route("/weight?from=%s&to=%s&filter=out"%(str(timeIn),str(timeOut)),'{"bruto":"390","containers":"C1,C2","direction":"Out","neto":"210","produces":"Bananas,Peaches"}')
+    test_weightafterPost_route("/weight?from=%s&to=%s&filter=out"%(str(timeIn),str(timeOut)),'{"bruto":"390","containers":"C1,C2","direction":"Out","neto":"210","produces":"Bananas,Peaches"}')
     # test_batch_weight("/batch-weight", "file not found or it already in database")
 
     print(status)
