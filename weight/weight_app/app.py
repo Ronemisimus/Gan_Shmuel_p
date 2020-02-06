@@ -30,17 +30,16 @@ def dbQuery(sql, isInsertOrUpdate=None):
 
 # Todo: See how we can instantiate the DB only once , and pass it to app.py
 def check_db_status(host='db',database='weightDB',user='user',password='alpine'):
-    mydb = mysql.connector.connect(
-    host='db',
-    database='weightDB',
-    user='root',
-    password='alpine',
-    port='3306'
-    )
-    mycursor = mydb.cursor()
-    res = mycursor.execute("SHOW TABLES")
+    try:
 
-    if not len(res):
+        mydb = mysql.connector.connect(
+        host='db',
+        database='weightDB',
+        user='root',
+        password='alpine',
+        port='3306'
+        )
+    except mysql.connector.Error as err:
         return False
     else:
         return True
