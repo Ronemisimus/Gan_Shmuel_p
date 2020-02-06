@@ -1,12 +1,15 @@
 from flask import Flask, request, Response, render_template, send_from_directory, redirect, url_for
 from datetime import datetime , time, timedelta
-from time import gmtime, strftime
+from time import strftime
 import mysql.connector
 from mysql.connector import Error
 from insertions import read_json_file , read_csv_file
 import json
 import os
 from collections import Counter 
+import time
+import sys
+
 app = Flask(__name__)
 
 def dbQuery(sql, isInsertOrUpdate=None):
@@ -28,7 +31,24 @@ def dbQuery(sql, isInsertOrUpdate=None):
 
 # Todo: See how we can instantiate the DB only once , and pass it to app.py
 def check_db_status(host='db',database='weightDB',user='user',password='alpine'):
-    return mysql.connector.connect(password='alpine', user='root', host='db', port='3306', database='weightDB' ,  auth_plugin='mysql_native_password')
+    mydb =  mysql.connector.connect(
+        password='alpine', 
+        user='root', 
+        host='db', 
+        port='3306', 
+        database='weightDB' ,  
+        auth_plugin='mysql_native_password')
+    mycursor = mydb.cursor()
+    mycursor.execute("show tables")
+    res = str(mycursor.fetchall())
+    print(res , file=sys.stderr)
+
+    if not res:
+        return False
+    else:
+        return True
+
+
 
 @app.route("/favicon.ico", methods=["GET"])
 def favicon():
@@ -39,10 +59,13 @@ def favicon():
 @app.route("/")
 @app.route("/health")
 def health():
-    if check_db_status():
-        return "OK"
-    else:
-        return Response(status=500)
+
+    while not check_db_status():
+        print("Trying to connect" , file=sys.stderr)
+    
+    return "Mysql is up"
+
+
 
 @app.route('/batch-weight' , methods=["POST"])
 def batch_weight():
@@ -66,26 +89,18 @@ def batch_weight():
 def unknown():
     # Returns a list of all recorded containers that have unknown weight:
     # "id1" "id2"
-    unknown_containers = ""
-    data = dbQuery("SELECT * FROM TruckContainers WHERE WeightProduce is NULL", isInsert=False)
-    for tuple in data:
-        unknown_containers = unknown_containers + str(tuple[0]) + '  '
-    return unknown_containers
+
+    unknown_containers = []
+    data = dbQuery("SELECT * FROM TruckContainers WHERE WeightProduce is NULL", False)
+    
+    rtn={}
+    for container in data:
+        rtn[str(container[0])] = {'TransactionID':str(container[1]),'ContainerID':str(container[2]),'Produce': str(container[3])}
+
+    return rtn
 
 @app.route('/session/<id>' , methods=["GET"])
 def session(id):
-    # method get session id and return json in format:
-    # [{
-    # 	"id": "<id>",
-    # 	"truckID": "<truck id>",
-    # 	"items":
-    #  [{
-    # 		"produce": "<type of produce>",
-    # 		"bruto": "<weight bruto>",
-    # 		"neto": "<weight_neto| null>"
-    # 	}]
-    # }]
-    # get table [ Produse | Bruto | Neto | Status | Truck ]
     query = """ SELECT
             t.Produce,
             (SUM(t.WeightProduce) + SUM(c.Weight)) AS bruto,
@@ -106,14 +121,14 @@ def session(id):
     if len(data) == 0 :
         return Response(status = "404")
     else :
-        json = '[{"id": "' + str(id) + '","truckID": "' + str(data[0][4]) + '","items": ['
+        json = '{"id": "' + str(id) + '","truckID": "' + str(data[0][4]) + '","items": ['
         for tuple in data:
-            if tuple[3] != "out":
+            if tuple[3] != "Out":
                 json += '{' +'"produce": "{}", "bruto" : "{}", "neto": "{}"'.format(tuple[0],tuple[1], "null")+ '},'
             else:
                 json += '{' +'"produce": "{}", "bruto" : "{}", "neto": "{}"'.format(tuple[0],tuple[1], tuple[2])+ '},'
-        json  = json[:-1] +  ']}]' 
-    return json
+        json  = json[:-1] +  ']}' 
+    return Response(json , mimetype='application/json')
 
 
 #Convert yyyymmsddhhmmss to datetime object
@@ -139,11 +154,26 @@ def get_item(id):
     if not id:
         return Response(status=404) 
 
+    if request.args.get("from"):
+        try:
+            t1 = parse_time(request.args.get('from'))
+        except:
+            return Response(status=400)
+    else:
+        t1 = datetime.now().strftime("%Y-%m-01 00:00:00")
+    if request.args.get("to"):
+        try:
+            t2 = parse_time(request.args.get('to'))
+        except:
+            return Response(status=400)
+    else: # override the t2 time
+        t2 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    if id.isdigit():
 
-    try:
         #if id is int dealing with containers
         id = int(id)
-        ans = dbQuery("SELECT * FROM TruckContainers where id = {} ".format(id), isInsertOrUpdate=False)
+        ans = dbQuery("SELECT * FROM TruckContainers where id = {} ".format(id), False)
        
         #if id is not exist
         if not len(ans):
@@ -159,31 +189,16 @@ def get_item(id):
                     INNER JOIN weightDB.Transactions t ON
                     t2.TransactionID = t.ID
                     WHERE
-                    t.TimeIn >= STR_TO_DATE('1997-12-01 12:00:00',
+                    t.TimeIn >= STR_TO_DATE('{}',
                     '%Y-%m-%d %T')
-                    AND t.TimeOut <= STR_TO_DATE('2021-12-01 12:00:00',
+                    AND t.TimeOut <= STR_TO_DATE('{}',
                     '%Y-%m-%d %T')
-                    AND t2.id = {};'''.format(id), isInsertOrUpdate=False)
+                    AND t2.id = {};'''.format(str(t1),str(t2),id), False)
         
         return {"id":str(id) , "tara":data[0][1] , "sessions":data[0][2]}
-        
+    else:
 
-
-
-        
-    except:
         #id is a string, dealing with trucks
-        t1 = request.args.get('from')
-        t1 = parse_time(t1)
-
-        t2 = request.args.get('to')
-        
-        # override the t2 time
-        if not t2:
-            t2 = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-        else:
-            t2 = datetime.strptime(t2 , '%Y%m%d%H%M%S')
-
         sessions_result_list = dbQuery('''SELECT t.TruckID, SUM(t2.WeightProduce), t.ID
         FROM
             weightDB.Transactions t
@@ -211,15 +226,21 @@ def get_item(id):
 @app.route("/weight", methods=['GET'])
 def weight():
 	if request.args.get("from"):
-		start = parse_time(request.args.get('from'))
+		try:
+			start = parse_time(request.args.get('from'))
+		except:
+			return Response(status=400)
 	else:
 		start = datetime.now().strftime("%Y-%m-%d 00:00:00")
 	if request.args.get("to"):
-		end = parse_time(request.args.get('to'))
+		try:
+			end = parse_time(request.args.get('to'))
+		except:
+			return Response(status=400)
 	else:
 		end = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-	if request.args.get("f"):
-		filt=("("+request.args.get("f")+")").replace("(","('").replace(",","','").replace(")","')")
+	if request.args.get("filter"):
+		filt=("("+request.args.get("filter")+")").replace("(","('").replace(",","','").replace(")","')")
 	else:
 		filt = "('in','out','none')"
 
@@ -247,7 +268,7 @@ def weight():
 
 @app.route("/weight", methods=['POST'])
 def weightpost():
-	currtime = ((datetime.utcnow() + timedelta(hours=2)).strftime("%Y-%m-%d %H:%M:%S"))
+	currtime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 	direction = request.args.get('direction')
 	truckID = request.args.get('truck')
 	containers = request.args.get('containers').split("+") #type:produce+type:produce
@@ -321,4 +342,4 @@ def input():
 	return render_template('weight_form.html')
 
 if __name__ == '__main__':
-    app.run(debug = True, host="0.0.0.0")
+    app.run(debug = True, host="0.0.0.0", threaded=False)
