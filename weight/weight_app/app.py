@@ -8,6 +8,7 @@ import json
 import os
 from collections import Counter 
 import time
+import sys
 
 app = Flask(__name__)
 
@@ -30,7 +31,24 @@ def dbQuery(sql, isInsertOrUpdate=None):
 
 # Todo: See how we can instantiate the DB only once , and pass it to app.py
 def check_db_status(host='db',database='weightDB',user='user',password='alpine'):
-    return mysql.connector.connect(password='alpine', user='root', host='db', port='3306', database='weightDB' ,  auth_plugin='mysql_native_password')
+    mydb =  mysql.connector.connect(
+        password='alpine', 
+        user='root', 
+        host='db', 
+        port='3306', 
+        database='weightDB' ,  
+        auth_plugin='mysql_native_password')
+    mycursor = mydb.cursor()
+    mycursor.execute("show tables")
+    res = str(mycursor.fetchall())
+    print(res , file=sys.stderr)
+
+    if not res:
+        return False
+    else:
+        return True
+
+
 
 @app.route("/favicon.ico", methods=["GET"])
 def favicon():
@@ -41,18 +59,11 @@ def favicon():
 @app.route("/")
 @app.route("/health")
 def health():
-    
-    # if check_db_status():
-    #     return "OK"
-    # else:
-    #     return Response(status=500)
-    counter = 10
+
     while not check_db_status():
-        counter -= 1
-        if counter ==  0 :
-            return Response(status=500)
-        time.sleep(1)
-    return "OK"
+        print("Trying to connect" , file=sys.stderr)
+    
+    return "Mysql is up"
 
 
 

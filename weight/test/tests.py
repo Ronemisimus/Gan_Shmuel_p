@@ -72,6 +72,10 @@ def test_batch_weight(path, expected):
 def test_health():
     global url
     global status
+    global test
+
+    if test:
+        url = 'http://18.194.232.207:8088'
     try:
         requests.get(url + '/health')
     except Exception as e :
@@ -105,7 +109,7 @@ def test_get_routes(path , expected):
         status = 1
 
 
-test = True
+test = False
 def main():
     test_health()
     test_get_routes('/unknown' ,{"7":{"ContainerID":"C1","Produce":"Test","TransactionID":"36"}})
