@@ -103,11 +103,9 @@ def test_get_routes(path , expected):
 test = False
 def main():
     test_health()
-    
-    test_get_routes('/unknown' ,{"14":{"ContainerID":"C2","Produce":"Bananas","TransactionID":"39"},"17":{"ContainerID":"C2","Produce":"Bananas","TransactionID":"40"},"7":{"ContainerID":"C1","Produce":"Test","TransactionID":"36"}})
+    test_get_routes('/unknown' ,{"7":{"ContainerID":"C1","Produce":"Test","TransactionID":"36"}})
     test_get_routes('/item/Truck1?from=20200202112732&to=20211231011500' ,{"id":"Truck1","sessions":[35],"tara":92})
     test_get_routes('/session/35' , {"id": "35","truckID": "Truck1","items": [{"produce": "Oranges", "bruto" : "46", "neto": "null"},{"produce": "Apples", "bruto" : "76", "neto": "null"}]})
-
 
 
     # test_weightPost_route("/weight?direction=in&truck=DebugTruck&containers=C1%3APeaches%2BC1%3APeaches%2BC2%3ABananas&weight=390",'{"37":{"bruto":"390","truck":"DebugTruck"}}')
