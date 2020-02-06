@@ -1,0 +1,36 @@
+version: "3.7"
+services:
+  app:
+    image: ${IMAGE_NAME}:latest
+    environment:
+      - "PYTHONUNBUFFERED=0" # To be removed on Prod
+      - "FLASK_ENV=development"
+      - "DB_HOST_NAME=${DB_HOST_NAME}"
+      - "DB_DATABASE=${DB_DATABASE}"
+      - "DB_USER=${DB_USER}"
+      - "DB_PASSWORD=${DB_PASSWORD}"
+      - "TEST_URL=${TEST_URL}"
+    expose: 
+      - "${APP_EXPOSE}"
+    ports:
+      - ${PORT}:${APP_EXPOSE}
+    links:
+      - db
+    volumes: 
+      - ./app/flask-app/in:/flask-app/in
+  db:
+    image: "mysql:5.7"
+    command: "--explicit_defaults_for_timestamp=1"
+    restart: always
+    environment: 
+      - "MYSQL_DATABASE=${DB_DATABASE}"
+      - "MYSQL_USER=${DB_USER}"
+      - "MYSQL_PASSWORD=${DB_PASSWORD}"
+      - "MYSQL_ROOT_PASSWORD=root"
+    volumes:
+      - ${PWD}/db/init/init.sql:/docker-entrypoint-initdb.d/init.sql/:ro
+      - provider-db:/var/lib/mysql
+    expose: 
+      - ${DB_EXPOSE}
+volumes:
+  provider-db:

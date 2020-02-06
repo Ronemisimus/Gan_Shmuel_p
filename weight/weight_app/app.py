@@ -89,6 +89,7 @@ def batch_weight():
 def unknown():
     # Returns a list of all recorded containers that have unknown weight:
     # "id1" "id2"
+
     unknown_containers = []
     data = dbQuery("SELECT * FROM TruckContainers WHERE WeightProduce is NULL", False)
     
