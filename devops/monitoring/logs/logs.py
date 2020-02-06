@@ -24,7 +24,7 @@ weight_team_lead = "nati-elmaliach"
 
 providers_team = {
     "M-Wittner" : "Matan.wittner@gmail.com",
-    "RonBenMoshe" : "RonBenMoshe@gmail.com",
+    "RonBenMoshe" : "ronmoshe333@gmail.com",
     "Neta182" : "Netaba@mta.ac.il"
 }
 
@@ -32,7 +32,7 @@ providers_team_lead = "RonBenMoshe"
 
 devops_team = {
     "IgorEnenberg" : "eigorek@gmail.com",
-    "itzik-alayev" : "",
+    "itzik-alayev" : "startukk@gmail.com",
     "ChrisPushkin" : "chrispushkin@gmail.com"
 }
 
@@ -67,22 +67,16 @@ def commits_report(data):
     log_entry("\n" + entry + "\n\n" + messages, "committers_log.txt")
 
     return Response("200")
-
+#
 def tests_report(data):
     messages = ""
 
-    data["tests"] = { 
-        "test1" : "success",
-   	    "test2" : "failure",
-   	    "test3" : "success",
-        "test4" : "success",
-        "test5" : "success"
-    }
-    
-    for k, v in data["tests"].items(): 
-        messages += "{} {}\n".format(k, "was successful." if v == "success" else "has failed.")
+    branch = data["tests"]["app_name"]
+    test_results = data["tests"]["test_result"].strip()        
 
-    entry = "Dummy Test Report for {}'s Latest Push".format(data['pusher']['name'])
+    messages += "Tests for {} branch: {}".format(branch, test_results if test_results != '0' else "All tests were successful!")
+
+    entry = "Test Report for {}'s Latest Push".format(data['pusher']['name'])
 
     log_entry("\n" + entry + "\n\n" + messages, "test_log.txt")
 
@@ -112,7 +106,11 @@ def log():
     entry = "Tests and Commits Reports for {}'s Latest Push".format(data['pusher']['name'])
 
     send_email(entry, ["test_log.txt", "committers_log.txt"], recipients)    
-#
+
+    return Response("200")
+
+@app.route('/health', methods=['GET'])
+def health():
     return Response("200")
 
 if __name__ == '__main__':
