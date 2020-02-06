@@ -32,14 +32,12 @@ def test_weightPost_route( path, expected):
     global url
     global status
     res =''
-    expected_res = ''
+    expected_res = expected
     try:
-        res = str(requests.post(url + path))
-        expected_res = expected
+        res = str(requests.post(url + path).content)
     except Exception as e:
         status = 1
-
-    if res != expected_res:
+    if not expected_res == res:
         status = 1
 
 def test_weightafterPost_route( path, expected):
@@ -104,8 +102,6 @@ def test_get_routes(path , expected):
         status = 1
 
     if res != expected_res:
-        print(res)
-        print(expected_res)
         status = 1
 
 
@@ -117,8 +113,8 @@ def main():
     test_get_routes('/session/35' , {"id": "35","truckID": "Truck1","items": [{"produce": "Oranges", "bruto" : "46", "neto": "null"},{"produce": "Apples", "bruto" : "76", "neto": "null"}]})
 
     # # #Testing Inserting Transaction with 3 containers using POST /weight
-    # timeIn=datetime.now().strftime("%Y%m%d%H%M%S")
-    # test_weightPost_route("/weight?direction=in&truck=DebugTruck&containers=C1%3APeaches%2BC1%3APeaches%2BC2%3ABananas&weight=390","<Response [200]>")
+    timeIn=datetime.now().strftime("%Y%m%d%H%M%S")
+    test_weightPost_route("/weight?direction=in&truck=DebugTruck&containers=C1%3APeaches%2BC1%3APeaches%2BC2%3ABananas&weight=390",{"39":{"bruto":"390","truck":"DebugTruck"}})
     # test_weightPost_route("/weight?direction=none&truck=DebugTruck&containers=C1%3APeaches%2BC2%3ABananas&weight=308","<Response [200]>")
     # test_weightPost_route("/weight?direction=none&truck=DebugTruck&containers=C2%3ABananas&weight=236","<Response [200]>")
     # test_weightPost_route("/weight?direction=out&truck=DebugTruck&containers=&weight=150","<Response [200]>")
