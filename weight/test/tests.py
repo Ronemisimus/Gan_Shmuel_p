@@ -120,7 +120,7 @@ def main():
     test_weightPost_route("/weight?direction=in&truck=DebugTruck&containers=C1%3APeaches%2BC1%3APeaches%2BC2%3ABananas&weight=390",'{"37":{"bruto":"390","truck":"DebugTruck"}}')
     test_weightPost_route("/weight?direction=none&truck=DebugTruck&containers=C1%3APeaches%2BC2%3ABananas&weight=308",'{"37":{"bruto":"390","truck":"DebugTruck"}}')
     test_weightPost_route("/weight?direction=none&truck=DebugTruck&containers=C2%3ABananas&weight=236",'{"37":{"bruto":"390","truck":"DebugTruck"}}')
-    test_weightPost_route("/weight?direction=out&truck=DebugTruck&containers=&weight=150",'{"37":{"bruto":"396","neto":"216","truck":"DebugTruck","truckTara":"150"}}')
+    test_weightPost_route("/weight?direction=out&truck=DebugTruck&containers=&weight=150",'{"37":{"bruto":"390","neto":"210","truck":"DebugTruck","truckTara":"150"}}')
     timeOut=datetime.now().strftime("%Y%m%d%H%M%S")
 
     # # # # Testing if Transaction was entered successfully
