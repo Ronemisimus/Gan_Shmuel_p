@@ -6,5 +6,6 @@ RUN pip install python-dotenv
 RUN pip install requests
 RUN mkdir test && mkdir stage && mkdir production
 COPY app.py .
+COPY index.html .
 
 ENTRYPOINT ["python3", "app.py"]
