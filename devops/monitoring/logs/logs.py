@@ -71,7 +71,10 @@ def commits_report(data):
 def tests_report(data):
     messages = ""
 
-    messages += "Tests for {} branch: {}".format(data["tests"]["app_name"], data["tests"]["test_result"] if data["tests"]["test_result"] != '0' else "All tests were successful!")
+    branch = data["tests"]["app_name"]
+    test_results = data["tests"]["test_result"].strip()        
+
+    messages += "Tests for {} branch: {}".format(branch, test_results if test_results != '0' else "All tests were successful!")
 
     entry = "Test Report for {}'s Latest Push".format(data['pusher']['name'])
 
