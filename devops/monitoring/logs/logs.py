@@ -67,7 +67,7 @@ def commits_report(data):
     log_entry("\n" + entry + "\n\n" + messages, "committers_log.txt")
 
     return Response("200")
-
+#
 def tests_report(data):
     messages = ""
 
