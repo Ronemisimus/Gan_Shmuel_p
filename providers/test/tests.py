@@ -7,6 +7,9 @@ test_port = os.environ['PORT']
 url = '{}:{}'.format(test_url, test_port)
 log_file = '.log'
 is_error = False
+mytest_code=200
+mytest_content=''
+client_errorrs=[400,404]
 
 new_truck = {'id':'214-63-807', 'provider_id': 10001}
 provider = {'name':'pro2', 'id':10002}
@@ -96,7 +99,7 @@ def test_get_truck():
   return
 
   def test_get_bill():
-    global get_bill_id
+        global get_bill_id
     global is_error
     try:
       requests.get('{}/bill/{}?from={}&to={}'.format(url,get_bill_id['id'],get_bill_id['from'],get_bill_id['to']))
@@ -105,6 +108,36 @@ def test_get_truck():
       log_error_msg('Trying to get bill for provider failed', e)
     return
 
+def test_rate_post():
+  global is_error 
+  global mytest_code
+  global mytest_content
+  global client_errorrs
+  file_to_test="test.xlsx"
+  try:
+    mytest= requests.post('{}/rates'.format(url),data={'file':file_to_test})
+    mytest_code=mytest.status_code
+    mytest_content=mytest.content.decode('utf-8')
+  except Exception as e:
+    if mytest_code not in client_errorrs:
+      is_error = True
+      log_error_msg(mytest_content, e)
+  return
+
+def test_rate_get():
+  global is_error 
+  global mytest_code
+  global mytest_content
+  global client_errorrs
+  try:
+    mytest= requests.get('{}/rates'.format(url))
+    mytest_code=mytest.status_code
+    mytest_content=mytest.content
+  except Exception as e:
+    if mytest_code not in client_errorrs:
+      is_error = True
+      log_error_msg(mytest_content, e)
+  return
 
 test_health()
 test_post_truck()
@@ -113,6 +146,8 @@ test_get_truck()
 test_provider_post()
 tset_provider_put()
 test_get_bill()
+test_rate_post()
+test_rate_get()
 
 if is_error:
   print('Error!!')

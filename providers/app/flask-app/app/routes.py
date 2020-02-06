@@ -251,7 +251,7 @@ def rates():
           db.session.commit()
         except Exception as e:
           msg = 'Could not insert new rate({})\n{}\n'.format(temp_obj, e)
-          return Response(msg, status=400)
+          return Response(msg, status=500)
         else:
           rate_list.append(temp_rate)
     book.release_resources()
