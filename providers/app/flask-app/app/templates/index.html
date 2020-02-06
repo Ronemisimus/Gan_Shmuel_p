@@ -78,7 +78,7 @@
     function getBill(){
       var sndData = getFormData($( "#getBillFrom" ));
       $.ajax({
-        url: "/bill/"+sndData.id,
+        url: "/bill/"+sndData.provider,
         type: 'GET',
         data: sndData.serialized,
         success: function(data) {
