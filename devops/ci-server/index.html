@@ -1,0 +1,121 @@
+<html>
+    <head>
+        <title>CI Dashboard</title>
+        <style>
+            body {
+                font-family: Arial;
+                font-size: 22px;
+            }
+
+            #dashboard-box {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                margin-right: -50%;
+                transform: translate(-50%, -50%);
+
+                width: 900px;
+
+                background-color: #DFDFDF;
+                
+                border: 2px solid black;
+                border-radius: 8px;
+            }
+
+            #dashboard-content {
+                padding: 10px;
+                padding-left: 10px;
+            }
+
+            #dashboard-header {
+                color: #007AE8;
+                font-size: 32px;
+            }
+
+            #dashboard-table table {
+                width:100%;
+            }
+
+            #dashboard-table {
+                border: 1px solid black;
+                border-radius: 3px;
+            }
+
+            #dashboard-table table tr:first-child td {
+                font-weight: bold;
+                background-color: #C8C8C8;
+            }
+
+            #dashboard-table table td {
+                border-bottom: black dashed 1px;
+            }
+
+            #dashboard-table table tr:last-child td {
+                border: none;
+            }
+
+            #dashboard-fb-buttons {
+                display: inline-flex;
+                width: 100%;
+            }
+
+            #dashboard-fb-buttons div:first-child {
+                border-right: none;
+                border-top-left-radius: 8px;
+                border-bottom-left-radius: 8px;
+            }
+
+            #dashboard-fb-buttons div:last-child {
+                border-left: none;
+                border-top-right-radius: 8px;
+                border-bottom-right-radius: 8px;
+            }
+
+            #dashboard-fb-buttons div {
+                flex: 1;
+                border: 2px solid black;
+                text-align: center;
+                background-color: #6BBAFF;
+            }
+
+            #dashboard-fb-buttons div:hover {
+                cursor: pointer;
+                background-color: #97CEFF;
+            }
+        </style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+        <script>
+            url = window.location.href;
+            function loadContainers() {
+                $.get(url+'containers', function(data) {
+                    $('#dashboard-table').html(data) 
+                })
+            }
+            function forceBuild(branch) {
+                console.log(branch)
+                $.ajax(url+'payload', {
+                    data: JSON.stringify({"ref": "refs/heads/"+branch}),
+                    contentType: 'application/json',
+                    type: 'POST'
+                })
+            }
+        </script>
+    </head>
+
+    <body onload='loadContainers()'>
+        <div id="dashboard-box">
+            <div id="dashboard-content">
+                <h1 id="dashboard-header">> CI Dashboard</h1>
+                <h1 id="dashboard-header">- Containers</h1>
+                <div id="dashboard-table">Loading containers...</div>
+                <h1 id="dashboard-header">- Force Build</h1>
+                <div id="dashboard-fb-buttons">
+                    <div id="dashboard-fb-master" onclick='forceBuild("master")'>master branch<br>(production)</div>
+                    <div id="dashboard-fb-provider" onclick='forceBuild("provider")'>provider branch<br>(staging)</div>
+                    <div id="dashboard-fb-weight" onclick='forceBuild("weight")'>weight branch<br>(staging)</div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
