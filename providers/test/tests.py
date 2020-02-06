@@ -16,6 +16,7 @@ get_truck_data = {'id': 'Truck1', 'from': 20200202112732, 'to': 20211231011500}
 get_truck_res = {"id":"Truck1","sessions":[35],"tara":92}
 post_provider='Itzik'
 put_provider={'id':10001,'name':"Moshe"}
+get_bill_id={'id':10001,'from': 20200202112732, 'to': 20211231011500}
 
 def log_error_msg(msg, error):
   naive_date = datetime.now(timezone.utc)
@@ -94,6 +95,16 @@ def test_get_truck():
     is_error = not (expected_res == res)
   return
 
+  def test_get_bill():
+    global get_bill_id
+    global is_error
+    try:
+      requests.get('{}/bill/{}?from={}&to={}'.format(url,get_bill_id['id'],get_bill_id['from'],get_bill_id['to']))
+    except Exception as e:
+      is_error = True
+      log_error_msg('Trying to get bill for provider failed', e)
+    return
+
 
 test_health()
 test_post_truck()
@@ -101,6 +112,7 @@ test_update_truck()
 test_get_truck()
 test_provider_post()
 tset_provider_put()
+test_get_bill()
 
 if is_error:
   print('Error!!')
