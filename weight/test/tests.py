@@ -34,9 +34,15 @@ def test_weightPost_route( path, expected):
     try:
         res = requests.post(url + path)
         res = str(res.content.decode('utf-8'))
-    except Exception as e:
+    except Exception as ex:
+        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        message = template.format(type(ex).__name__, ex.args)
+        print (message)
         status = 1
+
     if not expected_res in res:
+        print(expected_res)
+        print(res)
         status = 1
 
 def test_batch_weight(path, expected):
