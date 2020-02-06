@@ -53,6 +53,7 @@ def health():
             return Response(status=500)
         time.sleep(1)
     return "OK"
+    
 
 
 @app.route('/batch-weight' , methods=["POST"])
