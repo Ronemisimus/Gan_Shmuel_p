@@ -118,7 +118,7 @@ def main():
 
     # # #Testing Inserting Transaction with 3 containers using POST /weight
     timeIn=datetime.now().strftime("%Y%m%d%H%M%S")
-    test_weightPost_route("/weight?direction=in&truck=DebugTruck&containers=C1%3APeaches%2BC1%3APeaches%2BC2%3ABananas&weight=390",{"37":{"bruto":"390","truck":"DebugTruck"}})
+    test_weightPost_route("/weight?direction=in&truck=DebugTruck&containers=C1%3APeaches%2BC1%3APeaches%2BC2%3ABananas&weight=390",'{"37":{"bruto":"390","truck":"DebugTruck"}}')
     # test_weightPost_route("/weight?direction=none&truck=DebugTruck&containers=C1%3APeaches%2BC2%3ABananas&weight=308","<Response [200]>")
     # test_weightPost_route("/weight?direction=none&truck=DebugTruck&containers=C2%3ABananas&weight=236","<Response [200]>")
     # test_weightPost_route("/weight?direction=out&truck=DebugTruck&containers=&weight=150","<Response [200]>")
