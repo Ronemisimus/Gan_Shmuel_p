@@ -38,9 +38,6 @@ def test_weightPost_route( path, expected):
         res = res.content.decode('utf-8')
     except Exception as e:
         status = 1
-
-    print(str(type(expected_res)) + " " + str(expected_res))
-    print(str(type(res)) + " " + str(res))
     if not expected_res == res:
         status = 1
 
