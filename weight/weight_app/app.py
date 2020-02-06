@@ -7,6 +7,9 @@ from insertions import read_json_file , read_csv_file
 import json
 import os
 from collections import Counter 
+import time
+import sys
+
 app = Flask(__name__)
 
 def dbQuery(sql, isInsertOrUpdate=None):
@@ -28,7 +31,24 @@ def dbQuery(sql, isInsertOrUpdate=None):
 
 # Todo: See how we can instantiate the DB only once , and pass it to app.py
 def check_db_status(host='db',database='weightDB',user='user',password='alpine'):
-    return mysql.connector.connect(password='alpine', user='root', host='db', port='3306', database='weightDB' ,  auth_plugin='mysql_native_password')
+    mydb =  mysql.connector.connect(
+        password='alpine', 
+        user='root', 
+        host='db', 
+        port='3306', 
+        database='weightDB' ,  
+        auth_plugin='mysql_native_password')
+    mycursor = mydb.cursor()
+    mycursor.execute("show tables")
+    res = str(mycursor.fetchall())
+    print(res , file=sys.stderr)
+
+    if not res:
+        return False
+    else:
+        return True
+
+
 
 @app.route("/favicon.ico", methods=["GET"])
 def favicon():
@@ -39,10 +59,13 @@ def favicon():
 @app.route("/")
 @app.route("/health")
 def health():
-    if check_db_status():
-        return "OK"
-    else:
-        return Response(status=500)
+
+    while not check_db_status():
+        print("Trying to connect" , file=sys.stderr)
+    
+    return "Mysql is up"
+
+
 
 @app.route('/batch-weight' , methods=["POST"])
 def batch_weight():
@@ -66,26 +89,18 @@ def batch_weight():
 def unknown():
     # Returns a list of all recorded containers that have unknown weight:
     # "id1" "id2"
-    unknown_containers = ""
+
+    unknown_containers = []
     data = dbQuery("SELECT * FROM TruckContainers WHERE WeightProduce is NULL", False)
-    for tuple in data:
-        unknown_containers = unknown_containers + str(tuple[0]) + '  '
-    return unknown_containers
+    
+    rtn={}
+    for container in data:
+        rtn[str(container[0])] = {'TransactionID':str(container[1]),'ContainerID':str(container[2]),'Produce': str(container[3])}
+
+    return rtn
 
 @app.route('/session/<id>' , methods=["GET"])
 def session(id):
-    # method get session id and return json in format:
-    # [{
-    # 	"id": "<id>",
-    # 	"truckID": "<truck id>",
-    # 	"items":
-    #  [{
-    # 		"produce": "<type of produce>",
-    # 		"bruto": "<weight bruto>",
-    # 		"neto": "<weight_neto| null>"
-    # 	}]
-    # }]
-    # get table [ Produse | Bruto | Neto | Status | Truck ]
     query = """ SELECT
             t.Produce,
             (SUM(t.WeightProduce) + SUM(c.Weight)) AS bruto,
@@ -359,4 +374,4 @@ def input():
 	return render_template('weight_form.html')
 
 if __name__ == '__main__':
-    app.run(debug = True, host="0.0.0.0")
+    app.run(debug = True, host="0.0.0.0", threaded=False)
