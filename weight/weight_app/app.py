@@ -7,6 +7,8 @@ from insertions import read_json_file , read_csv_file
 import json
 import os
 from collections import Counter 
+import time
+
 app = Flask(__name__)
 
 def dbQuery(sql, isInsertOrUpdate=None):
@@ -39,10 +41,19 @@ def favicon():
 @app.route("/")
 @app.route("/health")
 def health():
-    if check_db_status():
-        return "OK"
-    else:
-        return Response(status=500)
+    
+    # if check_db_status():
+    #     return "OK"
+    # else:
+    #     return Response(status=500)
+    counter = 10
+    while not check_db_status():
+        counter -= 1
+        if counter ==  0 :
+            return Response(status=500)
+        time.sleep(1)
+    return "OK"
+
 
 @app.route('/batch-weight' , methods=["POST"])
 def batch_weight():
